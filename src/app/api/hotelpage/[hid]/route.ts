@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
-import { ostrovokClient } from '@/lib/ostrovok/client';
-import { getCached, setCached } from '@/lib/redis';
+import { searchCoalescer } from '@/lib/search/coalescer';
+import { searchCircuitBreaker, getStaleSearchCache, setStaleSearchCache } from '@/lib/search/circuit-breaker';
+import { checkRateLimit, getUserKey } from '@/lib/rate-limiter';
 
 export const runtime = 'nodejs';
 
@@ -17,25 +18,43 @@ export async function GET(req: Request, { params }: { params: { hid: string } })
     return NextResponse.json({ error: 'Missing required params: checkin, checkout' }, { status: 400 });
   }
 
-  const key = `hotelpage:${hid}:${checkin}:${checkout}:${adults}:${residency}`;
+  const userKey = getUserKey(req);
+  if (!(await checkRateLimit(`hotelpage:${userKey}:${hid}`, 20, 60_000))) {
+    return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
+  }
+
+  const paramsPayload = {
+    hotelIds: [hid],
+    checkin,
+    checkout,
+    guests: [{ adults }],
+    residency,
+  };
 
   try {
-    const cached = await getCached<any>(key);
-    if (cached) {
-      return NextResponse.json({ result: cached, cached: true });
+    const result = await searchCircuitBreaker.execute(
+      () =>
+        searchCoalescer.search({
+          hotelIds: [hid],
+          checkin,
+          checkout,
+          guests: [{ adults }],
+          residency,
+        }),
+      async () => {
+        const stale = await getStaleSearchCache(paramsPayload);
+        if (stale) {
+          return { data: stale, cached: true, stale: true };
+        }
+        throw new Error('No stale cache available');
+      }
+    );
+
+    if (result.cached && !result.stale) {
+      await setStaleSearchCache(paramsPayload, result.data, 60 * 60);
     }
 
-    const result = await ostrovokClient.getHotelpage({
-      hid,
-      checkin,
-      checkout,
-      guests: [{ adults }],
-      residency,
-    });
-
-    await setCached(key, result, 900);
-
-    return NextResponse.json({ result, cached: false });
+    return NextResponse.json({ result: result.data, cached: result.cached, coalesced: result.coalesced, stale: result.stale });
   } catch (error: any) {
     console.error('[HOTELPAGE ERROR]:', error);
     return NextResponse.json({ error: error.message || 'Hotelpage failed' }, { status: 500 });

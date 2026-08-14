@@ -1,13 +1,9 @@
 import { NextResponse } from 'next/server';
-import { ostrovokClient } from '@/lib/ostrovok/client';
-import { getCached, setCached } from '@/lib/redis';
+import { searchCoalescer } from '@/lib/search/coalescer';
+import { searchCircuitBreaker, getStaleSearchCache, setStaleSearchCache } from '@/lib/search/circuit-breaker';
+import { checkRateLimit, getUserKey } from '@/lib/rate-limiter';
 
 export const runtime = 'nodejs';
-
-function cacheKey(params: Record<string, string>) {
-  const sorted = Object.keys(params).sort().map(k => `${k}=${params[k]}`).join('&');
-  return `search:${sorted}`;
-}
 
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
@@ -21,25 +17,36 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: 'Missing required params: q, checkin, checkout' }, { status: 400 });
   }
 
-  const key = cacheKey({ q, checkin, checkout, adults: String(adults), residency });
+  const userKey = getUserKey(req);
+  if (!(await checkRateLimit(`search:${userKey}`, 30, 60_000))) {
+    return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
+  }
+
+  const params = {
+    regionId: Number(q),
+    checkin,
+    checkout,
+    guests: [{ adults }],
+    residency,
+  };
 
   try {
-    const cached = await getCached<any>(key);
-    if (cached) {
-      return NextResponse.json({ results: cached, cached: true });
+    const result = await searchCircuitBreaker.execute(
+      () => searchCoalescer.search(params),
+      async () => {
+        const stale = await getStaleSearchCache(params);
+        if (stale) {
+          return { data: stale, cached: true, stale: true };
+        }
+        throw new Error('No stale cache available');
+      }
+    );
+
+    if (result.cached && !result.stale) {
+      await setStaleSearchCache(params, result.data, 60 * 60);
     }
 
-    const results = await ostrovokClient.searchByRegion({
-      regionId: Number(q),
-      checkin,
-      checkout,
-      guests: [{ adults }],
-      residency,
-    });
-
-    await setCached(key, results, 900);
-
-    return NextResponse.json({ results, cached: false });
+    return NextResponse.json({ results: result.data, cached: result.cached, coalesced: result.coalesced, stale: result.stale });
   } catch (error: any) {
     console.error('[SEARCH ERROR]:', error);
     return NextResponse.json({ error: error.message || 'Search failed' }, { status: 500 });
