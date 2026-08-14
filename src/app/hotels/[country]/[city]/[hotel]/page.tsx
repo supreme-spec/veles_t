@@ -14,25 +14,27 @@ interface HotelPageProps {
 }
 
 export async function generateMetadata({ params }: HotelPageProps): Promise<Metadata> {
+  const { country, city, hotel } = await params;
   return {
-    title: `${params.hotel.replace(/-/g, ' ')} - отель в ${params.city.replace(/-/g, ' ')} | Велес Вояж`,
-    description: `Бронирование отеля ${params.hotel.replace(/-/g, ' ')} в городе ${params.city.replace(/-/g, ' ')}. Лучшие цены, мгновенное подтверждение, поддержка 24/7.`,
+    title: `${hotel.replace(/-/g, ' ')} - отель в ${city.replace(/-/g, ' ')} | Велес Вояж`,
+    description: `Бронирование отеля ${hotel.replace(/-/g, ' ')} в городе ${city.replace(/-/g, ' ')}. Лучшие цены, мгновенное подтверждение, поддержка 24/7.`,
     alternates: {
-      canonical: `${SITE_URL}/hotels/${params.country}/${params.city}/${params.hotel}`,
+      canonical: `${SITE_URL}/hotels/${country}/${city}/${hotel}`,
     },
     openGraph: {
-      title: `${params.hotel.replace(/-/g, ' ')} | Велес Вояж`,
-      description: `Бронирование отеля в ${params.city.replace(/-/g, ' ')} через официальное турагентство Велес Вояж.`,
-      url: `${SITE_URL}/hotels/${params.country}/${params.city}/${params.hotel}`,
+      title: `${hotel.replace(/-/g, ' ')} | Велес Вояж`,
+      description: `Бронирование отеля в ${city.replace(/-/g, ' ')} через официальное турагентство Велес Вояж.`,
+      url: `${SITE_URL}/hotels/${country}/${city}/${hotel}`,
       type: 'website',
     },
   };
 }
 
-export default function HotelDetailPage({ params }: HotelPageProps) {
-  const hotelName = params.hotel.replace(/-/g, ' ');
-  const cityName = params.city.replace(/-/g, ' ');
-  const countryName = params.country.replace(/-/g, ' ');
+export default async function HotelDetailPage({ params }: HotelPageProps) {
+  const { country, city, hotel } = await params;
+  const hotelName = hotel.replace(/-/g, ' ');
+  const cityName = city.replace(/-/g, ' ');
+  const countryName = country.replace(/-/g, ' ');
 
   const jsonLd = {
     '@context': 'https://schema.org',
@@ -103,7 +105,7 @@ export default function HotelDetailPage({ params }: HotelPageProps) {
 
           <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
             <h2 className="text-xl font-bold text-slate-900 mb-6">Оставить отзыв</h2>
-            <ReviewForm hotelHid={Number(params.hotel)} />
+            <ReviewForm hotelHid={8526976} />
           </div>
         </div>
 
