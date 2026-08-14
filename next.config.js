@@ -198,6 +198,30 @@ const nextConfig = {
         ],
       },
       {
+        source: '/images/(.*)',
+        headers: [
+          { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' },
+        ],
+      },
+      {
+        source: '/hotels/:path*',
+        headers: [
+          { key: 'Cache-Control', value: 'public, max-age=3600, stale-while-revalidate=86400' },
+        ],
+      },
+      {
+        source: '/api/search/:path*',
+        headers: [
+          { key: 'Cache-Control', value: 'public, max-age=900, stale-while-revalidate=1800' },
+        ],
+      },
+      {
+        source: '/api/booking/:path*',
+        headers: [
+          { key: 'Cache-Control', value: 'no-store, no-cache, must-revalidate' },
+        ],
+      },
+      {
         source: '/:path*',
         headers: [
           { key: 'X-DNS-Prefetch-Control', value: 'on' },

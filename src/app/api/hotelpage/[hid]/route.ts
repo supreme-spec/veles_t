@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { ostrovokClient } from '@/lib/ostrovok/client';
+import { getCached, setCached } from '@/lib/redis';
 
 export const runtime = 'nodejs';
 
@@ -16,7 +17,14 @@ export async function GET(req: Request, { params }: { params: { hid: string } })
     return NextResponse.json({ error: 'Missing required params: checkin, checkout' }, { status: 400 });
   }
 
+  const key = `hotelpage:${hid}:${checkin}:${checkout}:${adults}:${residency}`;
+
   try {
+    const cached = await getCached<any>(key);
+    if (cached) {
+      return NextResponse.json({ result: cached, cached: true });
+    }
+
     const result = await ostrovokClient.getHotelpage({
       hid,
       checkin,
@@ -25,7 +33,9 @@ export async function GET(req: Request, { params }: { params: { hid: string } })
       residency,
     });
 
-    return NextResponse.json({ result });
+    await setCached(key, result, 900);
+
+    return NextResponse.json({ result, cached: false });
   } catch (error: any) {
     console.error('[HOTELPAGE ERROR]:', error);
     return NextResponse.json({ error: error.message || 'Hotelpage failed' }, { status: 500 });

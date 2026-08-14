@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { db } from '@/db';
 import { reviews, bookings } from '@/db/schema';
 import { eq, desc, sql } from 'drizzle-orm';
+import { getCached, setCached } from '@/lib/redis';
 
 export const runtime = 'nodejs';
 
@@ -15,7 +16,14 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: 'hotelHid is required' }, { status: 400 });
   }
 
+  const key = `reviews:${hotelHid}:${page}:${limit}`;
+
   try {
+    const cached = await getCached<any>(key);
+    if (cached) {
+      return NextResponse.json(cached);
+    }
+
     const approvedReviews = await db
       .select()
       .from(reviews)
@@ -34,13 +42,17 @@ export async function GET(req: Request) {
 
     const aggregate = aggregateResult[0] || { averageRating: 0, totalReviews: 0 };
 
-    return NextResponse.json({
+    const payload = {
       reviews: approvedReviews,
       aggregate: {
         averageRating: Number(aggregate.averageRating),
         totalReviews: Number(aggregate.totalReviews),
       },
-    });
+    };
+
+    await setCached(key, payload, 300);
+
+    return NextResponse.json(payload);
   } catch (error: any) {
     console.error('[REVIEWS GET ERROR]:', error);
     return NextResponse.json({ error: error.message || 'Failed to fetch reviews' }, { status: 500 });

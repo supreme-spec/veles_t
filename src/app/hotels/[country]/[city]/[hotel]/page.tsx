@@ -4,6 +4,9 @@ import Image from 'next/image';
 import { ReviewList } from '@/components/ReviewList';
 import { ReviewForm } from '@/components/ReviewForm';
 import { SITE_URL } from '@/shared/constants/seo';
+import { getCached, setCached } from '@/lib/redis';
+
+export const revalidate = 3600;
 
 interface HotelPageProps {
   params: {
@@ -11,6 +14,13 @@ interface HotelPageProps {
     city: string;
     hotel: string;
   };
+}
+
+export async function generateStaticParams() {
+  return [
+    { country: 'russia', city: 'moscow', hotel: 'test-hotel' },
+    { country: 'russia', city: 'sochi', hotel: 'test-resort' },
+  ];
 }
 
 export async function generateMetadata({ params }: HotelPageProps): Promise<Metadata> {
