@@ -1,0 +1,51 @@
+import { NextResponse } from 'next/server';
+import { db } from '@/db';
+import { hotels } from '@/db/schema';
+import { eq, and, sql } from 'drizzle-orm';
+
+export const runtime = 'nodejs';
+
+export async function GET(req: Request) {
+  const { searchParams } = new URL(req.url);
+  const city = searchParams.get('city');
+  const country = searchParams.get('country');
+  const stars = searchParams.get('stars');
+  const limit = Number(searchParams.get('limit') || '20');
+
+  try {
+    const conditions = [eq(hotels.status, 'ACTIVE')];
+
+    if (city) {
+      conditions.push(sql`${hotels.city} ILIKE ${`%${city}%`}`);
+    }
+    if (country) {
+      conditions.push(sql`${hotels.country} ILIKE ${`%${country}%`}`);
+    }
+    if (stars) {
+      conditions.push(eq(hotels.stars, Number(stars)));
+    }
+
+    const results = await db
+      .select({
+        id: hotels.id,
+        ostrovokHid: hotels.ostrovokHid,
+        name: hotels.name,
+        slug: hotels.slug,
+        city: hotels.city,
+        country: hotels.country,
+        address: hotels.address,
+        stars: hotels.stars,
+        images: hotels.images,
+        amenities: hotels.amenities,
+        description: hotels.description,
+      })
+      .from(hotels)
+      .where(and(...conditions))
+      .limit(limit);
+
+    return NextResponse.json({ results });
+  } catch (error: any) {
+    console.error('[HOTELS SEARCH ERROR]:', error);
+    return NextResponse.json({ error: error.message || 'Search failed' }, { status: 500 });
+  }
+}

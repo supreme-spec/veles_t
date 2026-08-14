@@ -32,9 +32,11 @@
     "export": "next build && next export",
     "update:cities": "npx tsx scripts/update-cities.ts",
     "update:airports": "npx tsx scripts/update-airports.ts",
-    "update:data": "npm run update:cities && npm run update:airports"
+    "update:data": "npm run update:cities && npm run update:airports",
+    "sync:hotels": "tsx src/workers/sync-hotels.ts"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.1111.0",
     "@heroicons/react": "^2.0.18",
     "@types/node": "^26.1.2",
     "@types/nodemailer": "^7.0.1",
@@ -47,6 +49,7 @@
     "argon2": "^0.45.1",
     "axios": "^1.18.1",
     "bcryptjs": "^3.0.3",
+    "blurhash": "^2.0.5",
     "critters": "^0.0.25",
     "drizzle-kit": "^0.30.6",
     "drizzle-orm": "^0.45.2",
