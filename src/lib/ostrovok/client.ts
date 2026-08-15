@@ -50,6 +50,11 @@ export class OstrovokClient {
     }
   }
 
+  async getHotelDump() {
+    const response = await this.client.get('/b2b/v3/hotel/dump/');
+    return response.data;
+  }
+
   async getHotelContent(hid: number) {
     const response = await this.client.get('/b2b/v3/hotel/info/', {
       params: { hid },

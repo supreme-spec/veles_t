@@ -18,7 +18,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'bookHash is required' }, { status: 400 });
     }
 
-    const result = await ostrovokClient.prebookFromHotelpage({
+    const result = await ostrovokClient.prebook({
       bookHash,
       priceIncreasePercent,
     });
