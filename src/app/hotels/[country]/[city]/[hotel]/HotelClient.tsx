@@ -141,12 +141,12 @@ export default function HotelClient({ slug, city, country }: HotelClientProps) {
 
           <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
             <h2 className="text-xl font-bold text-slate-900 mb-6">Отзывы гостей</h2>
-            <ReviewList reviews={[]} averageRating={4.5} totalReviews={0} />
+            <p className="text-sm text-slate-500">Отзывы скоро появятся здесь.</p>
           </div>
 
           <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
             <h2 className="text-xl font-bold text-slate-900 mb-6">Оставить отзыв</h2>
-            <ReviewForm hotelHid={hotel.ostrovokHid || Number(hotel.id)} />
+            <p className="text-sm text-slate-500">Форма отзыва появится позже.</p>
           </div>
         </div>
 
