@@ -5,7 +5,7 @@ const nextConfig = {
   pageExtensions: ['js', 'jsx', 'ts', 'tsx'],
   typedRoutes: true,
   experimental: {
-    optimizePackageImports: ['framer-motion', 'lucide-react', 'maplibre-gl', 'react-map-gl'],
+    optimizePackageImports: ['lucide-react', 'maplibre-gl', 'react-map-gl'],
   },
   async redirects() {
     return [
