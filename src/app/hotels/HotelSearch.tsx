@@ -9,7 +9,37 @@ interface Hotel {
   country: string;
   stars: number;
   images?: any[];
-  ostrovokHid?: number;
+  slug?: string;
+}
+
+const CITY_SLUGS: Record<string, string> = {
+  'москва': 'moscow',
+  'санкт-петербург': 'saint-petersburg',
+  'сочи': 'sochi',
+  'казань': 'kazan',
+  'дубай': 'dubai',
+  'стамбул': 'istanbul',
+  'бангкок': 'bangkok',
+};
+
+const COUNTRY_SLUGS: Record<string, string> = {
+  'россия': 'russia',
+  'турция': 'turkey',
+  'оаэ': 'uae',
+  'таиланд': 'thailand',
+  'египет': 'egypt',
+  'испания': 'spain',
+  'италия': 'italy',
+  'греция': 'greece',
+};
+
+function slugify(text: string): string {
+  return text
+    .toLowerCase()
+    .replace(/[ё]/g, 'e')
+    .replace(/[а-я]/g, (char) => char)
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '') || text.toLowerCase();
 }
 
 export function HotelSearch() {
@@ -51,15 +81,11 @@ export function HotelSearch() {
     }
   };
 
-  const getOstrovokUrl = (hotel: Hotel) => {
-    if (hotel.ostrovokHid) {
-      const params = new URLSearchParams();
-      if (checkin) params.set('checkin', checkin);
-      if (checkout) params.set('checkout', checkout);
-      params.set('adults', adults);
-      return `https://www.ostrovok.ru/hotel/${hotel.ostrovokHid}?${params.toString()}`;
-    }
-    return 'https://www.ostrovok.ru';
+  const getHotelUrl = (hotel: Hotel) => {
+    const citySlug = CITY_SLUGS[hotel.city.toLowerCase()] || slugify(hotel.city);
+    const countrySlug = COUNTRY_SLUGS[hotel.country.toLowerCase()] || slugify(hotel.country);
+    const hotelSlug = hotel.slug || `hotel-${hotel.id}`;
+    return `/hotels/${countrySlug}/${citySlug}/${hotelSlug}`;
   };
 
   return (
@@ -149,12 +175,10 @@ export function HotelSearch() {
                 <h2 className="text-xl font-extrabold text-slate-900">{hotel.name}</h2>
                 <p className="text-xs text-slate-400 mt-1">{hotel.city}, {hotel.country}</p>
                 <a
-                  href={getOstrovokUrl(hotel)}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                  href={getHotelUrl(hotel)}
                   className="mt-4 bg-blue-900 hover:bg-blue-800 text-white font-bold text-sm px-4 py-2.5 rounded-xl transition-colors text-center"
                 >
-                  Забронировать
+                  Подробнее
                 </a>
               </div>
             </div>

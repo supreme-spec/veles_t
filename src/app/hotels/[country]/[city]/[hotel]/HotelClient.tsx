@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
+import { ReviewList } from '@/components/ReviewList';
+import { ReviewForm } from '@/components/ReviewForm';
 
 interface Hotel {
   id: string;
@@ -16,6 +18,15 @@ interface Hotel {
   ostrovokHid?: number;
 }
 
+interface Review {
+  id: string;
+  authorName: string;
+  rating: number;
+  content: string;
+  createdAt: string;
+  verified: boolean;
+}
+
 interface HotelClientProps {
   slug: string;
   city: string;
@@ -24,6 +35,9 @@ interface HotelClientProps {
 
 export default function HotelClient({ slug, city, country }: HotelClientProps) {
   const [hotel, setHotel] = useState<Hotel | null>(null);
+  const [reviews, setReviews] = useState<Review[]>([]);
+  const [averageRating, setAverageRating] = useState(0);
+  const [reviewsCount, setReviewsCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -35,7 +49,9 @@ export default function HotelClient({ slug, city, country }: HotelClientProps) {
         const res = await fetch(`/api/hotels/search?slug=${encodeURIComponent(slug)}&city=${encodeURIComponent(city)}`);
         const data = await res.json();
         if (data.results && data.results[0]) {
-          setHotel(data.results[0]);
+          const h = data.results[0];
+          setHotel(h);
+          await loadReviews(h.ostrovokHid || Number(h.id));
         } else {
           setError('Отель не найден');
         }
@@ -50,9 +66,28 @@ export default function HotelClient({ slug, city, country }: HotelClientProps) {
     loadHotel();
   }, [slug, city]);
 
+  const loadReviews = async (hotelHid: number) => {
+    try {
+      const res = await fetch(`/api/reviews?hotelHid=${hotelHid}`);
+      const data = await res.json();
+      if (data.reviews) {
+        setReviews(data.reviews);
+        setAverageRating(data.aggregate?.averageRating || 0);
+        setReviewsCount(data.aggregate?.totalReviews || 0);
+      }
+    } catch (err) {
+      console.error('Failed to load reviews:', err);
+    }
+  };
+
+  const handleReviewSubmitted = () => {
+    if (hotel) {
+      loadReviews(hotel.ostrovokHid || Number(hotel.id));
+    }
+  };
+
   const cityName = city.replace(/-/g, ' ');
   const countryName = country.replace(/-/g, ' ');
-  const hotelName = slug.replace(/-/g, ' ');
 
   if (loading) {
     return (
@@ -70,10 +105,6 @@ export default function HotelClient({ slug, city, country }: HotelClientProps) {
     );
   }
 
-  const ostrovokUrl = hotel.ostrovokHid
-    ? `https://www.ostrovok.ru/hotel/${hotel.ostrovokHid}`
-    : `https://www.ostrovok.ru/hotels/${encodeURIComponent(countryName)}/${encodeURIComponent(cityName)}/${encodeURIComponent(hotelName)}`;
-
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'Hotel',
@@ -85,8 +116,8 @@ export default function HotelClient({ slug, city, country }: HotelClientProps) {
     },
     aggregateRating: {
       '@type': 'AggregateRating',
-      ratingValue: 4.5,
-      reviewCount: 127,
+      ratingValue: averageRating || 4.5,
+      reviewCount: reviewsCount || 0,
       bestRating: 5,
     },
   };
@@ -140,28 +171,35 @@ export default function HotelClient({ slug, city, country }: HotelClientProps) {
 
           <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
             <h2 className="text-xl font-bold text-slate-900 mb-6">Отзывы гостей</h2>
-            <p className="text-sm text-slate-500">Отзывы скоро появятся здесь.</p>
+            <ReviewList
+              reviews={reviews}
+              averageRating={averageRating}
+              totalReviews={reviewsCount}
+            />
           </div>
 
           <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
             <h2 className="text-xl font-bold text-slate-900 mb-6">Оставить отзыв</h2>
-            <p className="text-sm text-slate-500">Форма отзыва появится позже.</p>
+            <ReviewForm
+              hotelHid={hotel.ostrovokHid || Number(hotel.id)}
+              onReviewSubmitted={handleReviewSubmitted}
+            />
           </div>
         </div>
 
         <div className="w-full lg:w-96">
-          <div className="bg-white p-6 border rounded-xl shadow-lg">
-            <h3 className="text-lg font-bold">Бронирование номеров</h3>
-            <p className="text-sm text-slate-500 mt-2">
-              Для бронирования свяжитесь с нами по телефону или через форму обратной связи.
-            </p>
+          <div className="bg-white p-6 border rounded-xl shadow-lg space-y-6">
+            <div>
+              <h3 className="text-lg font-bold">Бронирование</h3>
+              <p className="text-sm text-slate-500 mt-2">
+                Для бронирования свяжитесь с нами по телефону или через форму обратной связи. Мы подберем лучший тариф и подтвердим бронирование.
+              </p>
+            </div>
             <a
-              href={`https://www.ostrovok.ru/hotel/${hotel.ostrovokHid || Number(hotel.id)}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="block w-full text-center bg-blue-900 hover:bg-blue-800 text-white font-bold py-3 px-6 rounded-xl transition-colors mt-4"
+              href="tel:+79850635134"
+              className="block w-full text-center bg-blue-900 hover:bg-blue-800 text-white font-bold py-3 px-6 rounded-xl transition-colors"
             >
-              Забронировать на Ostrovok
+              Позвонить для бронирования
             </a>
           </div>
         </div>
