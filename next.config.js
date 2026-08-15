@@ -4,9 +4,6 @@ const nextConfig = {
   reactStrictMode: true,
   pageExtensions: ['js', 'jsx', 'ts', 'tsx'],
   typedRoutes: true,
-  experimental: {
-    optimizePackageImports: ['lucide-react', 'maplibre-gl', 'react-map-gl'],
-  },
   async redirects() {
     return [
       {
