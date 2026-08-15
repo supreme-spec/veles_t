@@ -191,10 +191,9 @@ interface SearchFilters {
 
 interface HotelSearchSERPProps {
   filters: SearchFilters;
-  onHotelSelect?: (hotel: Hotel) => void;
 }
 
-export const HotelSearchSERP = ({ filters, onHotelSelect }: HotelSearchSERPProps) => {
+export const HotelSearchSERP = ({ filters }: HotelSearchSERPProps) => {
   const [selectedHotelId, setSelectedHotelId] = useState<string | null>(null);
   const [sortBy, setSortBy] = useState<'popular' | 'price-asc' | 'price-desc' | 'rating'>('popular');
 

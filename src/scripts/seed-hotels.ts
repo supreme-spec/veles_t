@@ -1,6 +1,5 @@
 import { db } from '@/db';
 import { hotels } from '@/db/schema';
-import { sql } from 'drizzle-orm';
 
 const TEST_HOTELS = [
   {
@@ -58,6 +57,8 @@ async function seed() {
     try {
       await db.insert(hotels).values({
         ...hotel,
+        ostrovokId: String(hotel.ostrovokHid),
+        normalizedName: hotel.name.toLowerCase().trim(),
         status: 'ACTIVE',
         source: 'seed',
         lastSyncedAt: new Date(),

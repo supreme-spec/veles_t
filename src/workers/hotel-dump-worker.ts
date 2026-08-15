@@ -2,7 +2,7 @@ import fs from 'fs';
 import zlib from 'zlib';
 import JSONStream from 'JSONStream';
 import { db } from '@/db';
-import { hotelStatusEnum } from '@/db/schema';
+import { hotelStatusEnum, hotels } from '@/db/schema';
 import { ostrovokClient } from '@/lib/ostrovok/client';
 
 const BATCH_SIZE = 100;

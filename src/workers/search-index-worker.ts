@@ -27,8 +27,6 @@ export async function syncHotelsToMeilisearch() {
         city: hotels.city,
         country: hotels.country,
         stars: hotels.stars,
-        rating: hotels.avgRating,
-        price: hotels.minPrice,
         amenities: hotels.amenities,
         status: hotels.status,
       })

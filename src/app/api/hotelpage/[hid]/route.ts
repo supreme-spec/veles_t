@@ -6,7 +6,7 @@ import { eq, desc, sql } from 'drizzle-orm';
 
 export const runtime = 'nodejs';
 
-export async function GET(req: Request, { params }: { params: Promise<{ hid: string }> }) {
+export async function GET(_req: Request, { params }: { params: Promise<{ hid: string }> }) {
   const { hid } = await params;
 
   try {

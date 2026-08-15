@@ -1,9 +1,12 @@
 import Link from 'next/link';
 import Image from 'next/image';
-import { Hotel } from '@/db/schema';
+import type { Hotel } from '@/db/schema';
 
 interface HotelCardProps {
-  hotel: Hotel;
+  hotel: Hotel & {
+    avgRating?: number;
+    reviewCount?: number;
+  };
 }
 
 export function HotelCard({ hotel }: HotelCardProps) {

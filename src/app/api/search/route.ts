@@ -21,6 +21,7 @@ async function upsertHotel(h: any) {
   if (!h?.hid) return null;
   const normalizedName = String(h.name || '').toLowerCase().trim();
   const slug = `hotel-${h.hid}`;
+  const status = 'ACTIVE' as const;
   const payload = {
     ostrovokHid: h.hid,
     ostrovokId: String(h.hid),
@@ -40,7 +41,7 @@ async function upsertHotel(h: any) {
     amenities: Array.isArray(h.amenities) ? h.amenities : [],
     contacts: h.contacts || {},
     images: Array.isArray(h.images) ? h.images : [],
-    status: 'ACTIVE',
+    status,
     source: 'ostrovok',
     lastSyncedAt: new Date(),
     lastSeenAt: new Date(),
@@ -81,8 +82,8 @@ export async function GET(req: Request) {
       const dayAfter = new Date();
       dayAfter.setDate(dayAfter.getDate() + 2);
 
-      const finalCheckin = checkin || tomorrow.toISOString().split('T')[0];
-      const finalCheckout = checkout || dayAfter.toISOString().split('T')[0];
+      const finalCheckin = checkin || tomorrow.toISOString().split('T')[0]!;
+      const finalCheckout = checkout || dayAfter.toISOString().split('T')[0]!;
 
       const coords = CITY_COORDS[lowerQuery];
 

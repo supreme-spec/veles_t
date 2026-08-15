@@ -1,8 +1,4 @@
-import { Metadata } from 'next';
-import { notFound } from 'next/navigation';
-import Image from 'next/image';
-import { ReviewList } from '@/components/ReviewList';
-import { ReviewForm } from '@/components/ReviewForm';
+import type { Metadata } from 'next';
 import { SITE_URL } from '@/shared/constants/seo';
 import HotelClient from './HotelClient';
 
