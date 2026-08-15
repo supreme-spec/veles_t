@@ -3,6 +3,7 @@ import { ostrovokClient } from '@/lib/ostrovok/client';
 import { db } from '@/db';
 import { hotels } from '@/db/schema';
 import { eq, sql } from 'drizzle-orm';
+import { getCached, setCached } from '@/lib/redis';
 
 export const runtime = 'nodejs';
 
@@ -68,6 +69,11 @@ export async function GET(req: Request) {
 
   try {
     const lowerQuery = query.toLowerCase().trim();
+    const cacheKey = `search:${Buffer.from(`${lowerQuery}:${checkin}:${checkout}:${adults}:${residency}`).toString('base64')}`;
+    const cached = await getCached<any>(cacheKey);
+    if (cached) {
+      return NextResponse.json({ ...cached, cached: true });
+    }
 
     if (checkin && checkout) {
       const tomorrow = new Date();
@@ -111,7 +117,9 @@ export async function GET(req: Request) {
             .map(r => r.value)
             .filter(Boolean);
 
-          return NextResponse.json({ results, source: 'ostrovok' });
+          const payload = { results, source: 'ostrovok' };
+          await setCached(cacheKey, payload, 900);
+          return NextResponse.json(payload);
         }
       } catch (error) {
         console.error('[SEARCH OSTROVOK ERROR]:', error);
@@ -136,7 +144,9 @@ export async function GET(req: Request) {
       .where(sql`${hotels.name} ILIKE ${`%${query}%`} OR ${hotels.city} ILIKE ${`%${query}%`} OR ${hotels.country} ILIKE ${`%${query}%`}`)
       .limit(20);
 
-    return NextResponse.json({ results: localResults, source: 'local' });
+    const localPayload = { results: localResults, source: 'local' };
+    await setCached(cacheKey, localPayload, 900);
+    return NextResponse.json(localPayload);
   } catch (error: any) {
     console.error('[SEARCH ERROR]:', error);
     return NextResponse.json({ error: error.message || 'Search failed' }, { status: 500 });
