@@ -10,6 +10,7 @@ export async function GET(req: Request) {
   const city = searchParams.get('city');
   const country = searchParams.get('country');
   const stars = searchParams.get('stars');
+  const slug = searchParams.get('slug');
   const limit = Number(searchParams.get('limit') || '20');
 
   try {
@@ -23,6 +24,9 @@ export async function GET(req: Request) {
     }
     if (stars) {
       conditions.push(eq(hotels.stars, Number(stars)));
+    }
+    if (slug) {
+      conditions.push(eq(hotels.slug, slug));
     }
 
     const results = await db
