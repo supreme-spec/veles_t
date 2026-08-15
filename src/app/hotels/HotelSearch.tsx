@@ -16,22 +16,25 @@ export function HotelSearch() {
   const [results, setResults] = useState<Hotel[]>([]);
   const [loading, setLoading] = useState(false);
   const [searched, setSearched] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setSearched(true);
+    setError(null);
 
     try {
       const res = await fetch(`/api/search?q=${encodeURIComponent(query)}`);
       const data = await res.json();
-      if (data.results) {
+      if (data.results && Array.isArray(data.results)) {
         setResults(data.results);
       } else {
         setResults([]);
       }
     } catch (err) {
       console.error(err);
+      setError('Ошибка поиска');
       setResults([]);
     } finally {
       setLoading(false);
@@ -61,7 +64,13 @@ export function HotelSearch() {
         </div>
       </form>
 
-      {searched && results.length === 0 && !loading && (
+      {error && (
+        <div className="max-w-3xl mx-auto mb-6 p-4 bg-red-50 border border-red-200 text-red-800 rounded-xl">
+          {error}
+        </div>
+      )}
+
+      {searched && results.length === 0 && !loading && !error && (
         <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-12 text-center">
           <p className="text-slate-500 text-lg">Отели не найдены. Попробуйте изменить запрос.</p>
         </div>
