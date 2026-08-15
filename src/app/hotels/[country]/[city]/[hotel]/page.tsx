@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
-import { SITE_URL } from '@/shared/constants/seo';
 import HotelClient from './HotelClient';
+
+const SITE_URL = 'https://veles-voyage.ru';
 
 export const revalidate = 3600;
 

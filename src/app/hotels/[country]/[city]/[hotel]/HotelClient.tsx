@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
-import { BookingForm } from '@/components/BookingForm';
 
 interface Hotel {
   id: string;
@@ -151,11 +150,19 @@ export default function HotelClient({ slug, city, country }: HotelClientProps) {
         </div>
 
         <div className="w-full lg:w-96">
-          <BookingForm hotelHid={hotel.ostrovokHid || Number(hotel.id)} hotelName={hotel.name} />
-          <div className="mt-4 bg-white p-6 border rounded-xl shadow-lg">
-            <p className="text-xs text-slate-400 text-center">
-              Бронирование через партнёра Ostrovok.ru
+          <div className="bg-white p-6 border rounded-xl shadow-lg">
+            <h3 className="text-lg font-bold">Бронирование номеров</h3>
+            <p className="text-sm text-slate-500 mt-2">
+              Для бронирования свяжитесь с нами по телефону или через форму обратной связи.
             </p>
+            <a
+              href={`https://www.ostrovok.ru/hotel/${hotel.ostrovokHid || Number(hotel.id)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block w-full text-center bg-blue-900 hover:bg-blue-800 text-white font-bold py-3 px-6 rounded-xl transition-colors mt-4"
+            >
+              Забронировать на Ostrovok
+            </a>
           </div>
         </div>
       </div>

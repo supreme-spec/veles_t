@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { generateEnhancedSEOMetadata } from '@/lib/seo/unifiedSEO';
-import { SITE_URL } from '@/shared/constants/seo';
+
+const SITE_URL = 'https://veles-voyage.ru';
 
 export const hotelsMetadata: Metadata = generateEnhancedSEOMetadata({
   title: 'Отели по миру: поиск и бронирование онлайн 2026',
