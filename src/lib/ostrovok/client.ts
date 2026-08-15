@@ -140,6 +140,10 @@ export class OstrovokClient {
   getConfig() {
     return { ...this.config };
   }
+
+  getTestHotelHid() {
+    return 8526976;
+  }
 }
 
 export const ostrovokClient = new OstrovokClient();
