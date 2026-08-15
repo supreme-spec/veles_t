@@ -2,8 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
-import { ReviewList } from '@/components/ReviewList';
-import { ReviewForm } from '@/components/ReviewForm';
+import { BookingForm } from '@/components/BookingForm';
 
 interface Hotel {
   id: string;
@@ -152,26 +151,10 @@ export default function HotelClient({ slug, city, country }: HotelClientProps) {
         </div>
 
         <div className="w-full lg:w-96">
-          <div className="bg-white p-6 border rounded-xl shadow-lg space-y-6">
-            <div className="flex gap-0.5">
-              {Array.from({ length: hotel.stars }).map((_, i) => (
-                <span key={i} className="text-amber-500 text-lg">★</span>
-              ))}
-            </div>
-            <div>
-              <p className="text-sm text-slate-500">{hotel.address}</p>
-              <p className="text-sm text-slate-500">{hotel.city}, {hotel.country}</p>
-            </div>
-            <a
-              href={ostrovokUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="block w-full text-center bg-blue-900 hover:bg-blue-800 text-white font-bold py-3 px-6 rounded-xl transition-colors"
-            >
-              Забронировать на Ostrovok
-            </a>
+          <BookingForm hotelHid={hotel.ostrovokHid || Number(hotel.id)} hotelName={hotel.name} />
+          <div className="mt-4 bg-white p-6 border rounded-xl shadow-lg">
             <p className="text-xs text-slate-400 text-center">
-              Вы будете перенаправлены на Ostrovok.ru
+              Бронирование через партнёра Ostrovok.ru
             </p>
           </div>
         </div>
