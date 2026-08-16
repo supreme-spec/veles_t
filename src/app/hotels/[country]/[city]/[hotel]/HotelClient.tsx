@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { BookingForm } from '@/components/BookingForm';
+import { CertificationTestCases } from '@/components/CertificationTestCases';
 import { ReviewList } from '@/components/ReviewList';
 import { ReviewForm } from '@/components/ReviewForm';
 
@@ -190,12 +191,16 @@ export default function HotelClient({ slug, city, country }: HotelClientProps) {
           </div>
         </div>
 
-        <div className="w-full lg:w-96">
+        <div className="w-full lg:w-96 space-y-6">
           <BookingForm 
             hotelHid={hotel.ostrovokHid || Number(hotel.id)} 
             hotelName={hotel.name}
             cancellationPolicies={hotel.cancellationPolicies}
             taxes={hotel.roomsData?.taxes || []}
+          />
+          <CertificationTestCases 
+            hotelHid={hotel.ostrovokHid || Number(hotel.id)} 
+            hotelName={hotel.name}
           />
         </div>
       </div>
