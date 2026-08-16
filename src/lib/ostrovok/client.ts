@@ -41,7 +41,6 @@ export class OstrovokClient {
     try {
       const response = await this.client.get('/b2b/v3/hotel/info/', {
         params: { hid: 8526976, language: 'ru' },
-        data: { hid: 8526976, language: 'ru' },
       });
       return { success: true, data: response.data };
     } catch (error: any) {
@@ -54,14 +53,29 @@ export class OstrovokClient {
   }
 
   async getHotelDump() {
-    const response = await this.client.get('/b2b/v3/hotel/info/dump/', { data: { language: 'ru' } });
+    const response = await this.client.get('/b2b/v3/hotel/info/dump/', {
+      params: { language: 'ru' },
+    });
+    return response.data;
+  }
+
+  async getIncrementalDump() {
+    const response = await this.client.get('/b2b/v3/hotel/info/incremental_dump/', {
+      params: { language: 'ru' },
+    });
+    return response.data;
+  }
+
+  async getRegionsDump() {
+    const response = await this.client.get('/b2b/v3/hotel/region/dump/', {
+      params: { language: 'ru' },
+    });
     return response.data;
   }
 
   async getHotelContent(hid: number) {
     const response = await this.client.get('/b2b/v3/hotel/info/', {
       params: { hid, language: 'ru' },
-      data: { hid, language: 'ru' },
     });
     return response.data;
   }
@@ -134,8 +148,24 @@ export class OstrovokClient {
     return response.data;
   }
 
+  async getRateInfo(params: { matchHash: string; searchHash?: string }) {
+    const response = await this.client.post('/b2b/v3/hotel/rate/info/', {
+      ...params,
+      language: 'ru',
+    });
+    return response.data;
+  }
+
   async prebook(params: { bookHash: string; priceIncreasePercent?: number }) {
     const response = await this.client.post('/b2b/v3/hotel/prebook', {
+      ...params,
+      language: 'ru',
+    });
+    return response.data;
+  }
+
+  async prebookFromSearch(params: { searchHash: string; priceIncreasePercent?: number }) {
+    const response = await this.client.post('/b2b/v3/serp/prebook/', {
       ...params,
       language: 'ru',
     });
@@ -177,6 +207,14 @@ export class OstrovokClient {
   async createCreditCardToken(params: any) {
     const response = await this.client.post('/b2b/v3/hotel/order/booking/card-token/', {
       ...params,
+      language: 'ru',
+    });
+    return response.data;
+  }
+
+  async getBookingInfo(partnerOrderId: string) {
+    const response = await this.client.post('/b2b/v3/hotel/order/info/', {
+      partnerOrderId,
       language: 'ru',
     });
     return response.data;

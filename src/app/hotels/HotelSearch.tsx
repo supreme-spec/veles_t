@@ -42,6 +42,16 @@ function slugify(text: string): string {
     .replace(/^-+|-+$/g, '') || text.toLowerCase();
 }
 
+const CITIES = [
+  { name: 'Москва', country: 'Россия', slug: 'moscow', countrySlug: 'russia' },
+  { name: 'Санкт-Петербург', country: 'Россия', slug: 'saint-petersburg', countrySlug: 'russia' },
+  { name: 'Сочи', country: 'Россия', slug: 'sochi', countrySlug: 'russia' },
+  { name: 'Казань', country: 'Россия', slug: 'kazan', countrySlug: 'russia' },
+  { name: 'Дубай', country: 'ОАЭ', slug: 'dubai', countrySlug: 'uae' },
+  { name: 'Стамбул', country: 'Турция', slug: 'istanbul', countrySlug: 'turkey' },
+  { name: 'Бангкок', country: 'Таиланд', slug: 'bangkok', countrySlug: 'thailand' },
+];
+
 export function HotelSearch() {
   const [query, setQuery] = useState('');
   const [checkin, setCheckin] = useState('');
@@ -81,6 +91,20 @@ export function HotelSearch() {
     }
   };
 
+  const handleCityClick = (city: { name: string; slug: string; countrySlug: string }) => {
+    setQuery(city.name);
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const dayAfter = new Date();
+    dayAfter.setDate(dayAfter.getDate() + 2);
+    setCheckin(tomorrow.toISOString().split('T')[0]!);
+    setCheckout(dayAfter.toISOString().split('T')[0]!);
+    setAdults('2');
+    setSearched(false);
+    setResults([]);
+    setError(null);
+  };
+
   const getHotelUrl = (hotel: Hotel) => {
     const citySlug = CITY_SLUGS[hotel.city.toLowerCase()] || slugify(hotel.city);
     const countrySlug = COUNTRY_SLUGS[hotel.country.toLowerCase()] || slugify(hotel.country);
@@ -98,8 +122,14 @@ export function HotelSearch() {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Город, отель или страна"
+              list="city-suggestions"
               className="flex-1 px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
+            <datalist id="city-suggestions">
+              {CITIES.map((city) => (
+                <option key={city.slug} value={city.name} />
+              ))}
+            </datalist>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div>
                 <label className="block text-xs text-slate-500 mb-1">Заезд</label>
@@ -142,6 +172,22 @@ export function HotelSearch() {
           </div>
         </div>
       </form>
+
+      <div className="max-w-3xl mx-auto mb-8">
+        <p className="text-xs text-slate-500 mb-2">Популярные направления:</p>
+        <div className="flex flex-wrap gap-2">
+          {CITIES.map((city) => (
+            <button
+              key={city.slug}
+              type="button"
+              onClick={() => handleCityClick(city)}
+              className="text-xs bg-slate-50 hover:bg-slate-100 text-slate-700 px-3 py-1.5 rounded-lg border border-slate-200 transition-colors"
+            >
+              {city.name}
+            </button>
+          ))}
+        </div>
+      </div>
 
       {error && (
         <div className="max-w-3xl mx-auto mb-6 p-4 bg-red-50 border border-red-200 text-red-800 rounded-xl">
