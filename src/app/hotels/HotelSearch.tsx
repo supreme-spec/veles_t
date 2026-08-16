@@ -139,14 +139,8 @@ export function HotelSearch() {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Город, отель или страна"
-              list="city-suggestions"
               className="flex-1 px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
-            <datalist id="city-suggestions">
-              {CITIES.map((city) => (
-                <option key={city.slug} value={city.name} />
-              ))}
-            </datalist>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div>
                 <label className="block text-xs text-slate-500 mb-1">Заезд</label>
