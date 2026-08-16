@@ -65,7 +65,17 @@ export async function GET(req: Request) {
   const checkout = searchParams.get('checkout');
   const adults = Number(searchParams.get('adults') || '2');
   const childrenParam = searchParams.get('children');
-  const children: number[] = childrenParam ? JSON.parse(childrenParam) : [];
+  let children: number[] = [];
+  if (childrenParam) {
+    try {
+      const parsed = JSON.parse(childrenParam);
+      if (Array.isArray(parsed)) {
+        children = parsed.filter((age: any) => typeof age === 'number' && age >= 0 && age <= 17);
+      }
+    } catch {
+      children = [];
+    }
+  }
   const residency = searchParams.get('residency') || 'RU';
 
   if (!query) {
