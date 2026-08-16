@@ -20,20 +20,25 @@ export async function POST(req: Request) {
 
     const maxRetries = 10;
     let lastError: any = null;
+    let currentPartnerOrderId = partnerOrderId;
 
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
       try {
+        if (attempt > 1) {
+          currentPartnerOrderId = `order-${Date.now().toString(36)}${Math.random().toString(36).slice(2)}`;
+        }
+
         const result = await ostrovokClient.createBookingProcess({
           bookHash,
-          partnerOrderId,
+          partnerOrderId: currentPartnerOrderId,
           language: language || 'ru',
           rooms,
           user,
-          partner: partner || { partnerOrderId },
+          partner: partner || { partnerOrderId: currentPartnerOrderId },
         });
 
         if (result.status === 'ok') {
-          return NextResponse.json({ result, attempt });
+          return NextResponse.json({ result, attempt, partnerOrderId: currentPartnerOrderId });
         }
 
         lastError = result;

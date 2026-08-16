@@ -1,10 +1,7 @@
 import { ostrovokClient } from '@/lib/ostrovok/client';
 import { db } from '@/db';
 import { hotels } from '@/db/schema';
-import { eq, sql } from 'drizzle-orm';
-
-const BATCH_SIZE = 1000;
-const OFFSET_STEP = 1000;
+import { eq } from 'drizzle-orm';
 
 async function processHotelDump() {
   console.log('[DUMP] Starting hotel dump processing...');
@@ -38,7 +35,7 @@ async function processHotelDump() {
             contacts: hotel.contacts || {},
             images: Array.isArray(hotel.images) ? hotel.images : [],
             cancellationPolicies: hotel.metapolicy_struct?.cancellation_penalties || null,
-            roomsData: hotel.metapolicy_struct?.meal ? { mealTypes: hotel.metapolicy_struct.meal } : null,
+            roomsData: hotel.metapolicy_struct?.meal ? { mealTypes: hotel.metapolicy_struct.meal, taxes: hotel.metapolicy_struct.tax_data?.taxes || [] } : null,
             status: 'ACTIVE',
             source: 'ostrovok_dump',
             lastSyncedAt: new Date(),
@@ -52,7 +49,7 @@ async function processHotelDump() {
               amenities: Array.isArray(hotel.amenities) ? hotel.amenities : [],
               images: Array.isArray(hotel.images) ? hotel.images : [],
               cancellationPolicies: hotel.metapolicy_struct?.cancellation_penalties || null,
-              roomsData: hotel.metapolicy_struct?.meal ? { mealTypes: hotel.metapolicy_struct.meal } : null,
+              roomsData: hotel.metapolicy_struct?.meal ? { mealTypes: hotel.metapolicy_struct.meal, taxes: hotel.metapolicy_struct.tax_data?.taxes || [] } : null,
               lastSyncedAt: new Date(),
               updatedAt: new Date(),
             },
@@ -95,7 +92,10 @@ async function processIncrementalDump() {
           payload.cancellationPolicies = update.metapolicy_struct.cancellation_penalties;
         }
         if (update.metapolicy_struct?.meal) {
-          payload.roomsData = { mealTypes: update.metapolicy_struct.meal };
+          payload.roomsData = {
+            mealTypes: update.metapolicy_struct.meal,
+            taxes: update.metapolicy_struct.tax_data?.taxes || [],
+          };
         }
 
         await db.update(hotels)

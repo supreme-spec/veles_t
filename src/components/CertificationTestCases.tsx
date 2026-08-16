@@ -108,10 +108,10 @@ export function CertificationTestCases({ hotelHid, hotelName }: CertificationTes
             phone: guestData.phone,
             first_name: guestData.firstName,
             last_name: guestData.lastName,
-            residency: testCase === 'single_child' ? 'UZ' : 'RU',
           },
           partner: { partnerOrderId: partnerOrderIdValue },
           language: 'ru',
+          residency: testCase === 'single_child' ? 'UZ' : 'RU',
         }),
       });
 
@@ -152,6 +152,13 @@ export function CertificationTestCases({ hotelHid, hotelName }: CertificationTes
         return;
       }
 
+      if (startData.result?.status === '3ds' || startData.result?.three_ds_url) {
+        setResult({ step: '3ds', data: startData });
+        setError('Требуется 3DS аутентификация. В production это будет redirect на страницу банка.');
+        setStep('error');
+        return;
+      }
+
       setPartnerOrderId(partnerOrderIdValue);
       setStep('booking');
 
@@ -169,6 +176,13 @@ export function CertificationTestCases({ hotelHid, hotelName }: CertificationTes
 
         if (checkData.result?.status === 'ok') {
           setStep('success');
+          return;
+        }
+
+        if (checkData.result?.status === '3ds' || checkData.result?.three_ds_url) {
+          setResult({ step: '3ds', data: checkData });
+          setError('Требуется 3DS аутентификация. В production это будет redirect на страницу банка.');
+          setStep('error');
           return;
         }
 

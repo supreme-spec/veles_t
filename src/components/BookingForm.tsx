@@ -133,8 +133,10 @@ export function BookingForm({ hotelHid, hotelName, cancellationPolicies, taxes }
 
       const data = await res.json();
       if (res.ok && data.result?.status === 'ok') {
+        const finalPartnerOrderId = data.partnerOrderId || partnerOrderIdValue;
+        setPartnerOrderId(finalPartnerOrderId);
         setStep('booking');
-        await handleStartBooking(partnerOrderIdValue);
+        await handleStartBooking(finalPartnerOrderId);
       } else {
         setError(data.error || 'Create booking failed');
         setStep('error');
@@ -148,7 +150,7 @@ export function BookingForm({ hotelHid, hotelName, cancellationPolicies, taxes }
     }
   };
 
-  const handleStartBooking = async (orderId: string) => {
+  const handleStartBooking = async (initialOrderId: string) => {
     if (!bookHash) return;
 
     setLoading(true);
@@ -156,15 +158,21 @@ export function BookingForm({ hotelHid, hotelName, cancellationPolicies, taxes }
 
     const maxRetries = 10;
     let lastError: any = null;
+    let currentOrderId = initialOrderId;
 
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
       try {
+        if (attempt > 1) {
+          currentOrderId = `order-${Date.now().toString(36)}${Math.random().toString(36).slice(2)}`;
+          setPartnerOrderId(currentOrderId);
+        }
+
         const res = await fetch('/api/booking/start', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             bookHash,
-            partnerOrderId: orderId,
+            partnerOrderId: currentOrderId,
             rooms: rooms.map(room => ({
               guests: [{ adults: room.adults, children: room.childrenAges }],
             })),
@@ -174,7 +182,7 @@ export function BookingForm({ hotelHid, hotelName, cancellationPolicies, taxes }
               first_name: guestData.firstName,
               last_name: guestData.lastName,
             },
-            partner: { partnerOrderId: orderId },
+            partner: { partnerOrderId: currentOrderId },
             paymentType: { type: 'hotel' },
             language: 'ru',
           }),
@@ -188,7 +196,7 @@ export function BookingForm({ hotelHid, hotelName, cancellationPolicies, taxes }
             setLoading(false);
             return;
           }
-          await pollBookingStatus(orderId);
+          await pollBookingStatus(currentOrderId);
           return;
         }
 
