@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
+import { BookingForm } from '@/components/BookingForm';
 import { ReviewList } from '@/components/ReviewList';
 import { ReviewForm } from '@/components/ReviewForm';
 
@@ -188,20 +189,7 @@ export default function HotelClient({ slug, city, country }: HotelClientProps) {
         </div>
 
         <div className="w-full lg:w-96">
-          <div className="bg-white p-6 border rounded-xl shadow-lg space-y-6">
-            <div>
-              <h3 className="text-lg font-bold">Бронирование</h3>
-              <p className="text-sm text-slate-500 mt-2">
-                Для бронирования свяжитесь с нами по телефону или через форму обратной связи. Мы подберем лучший тариф и подтвердим бронирование.
-              </p>
-            </div>
-            <a
-              href="tel:+79850635134"
-              className="block w-full text-center bg-blue-900 hover:bg-blue-800 text-white font-bold py-3 px-6 rounded-xl transition-colors"
-            >
-              Позвонить для бронирования
-            </a>
-          </div>
+          <BookingForm hotelHid={hotel.ostrovokHid || Number(hotel.id)} hotelName={hotel.name} />
         </div>
       </div>
     </>

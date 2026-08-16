@@ -22,10 +22,11 @@ export async function GET(req: Request) {
         const today = new Date();
         const tomorrow = new Date(today.getTime() + 24 * 60 * 60 * 1000);
         const search = await ostrovokClient.searchByHotelIds({
-          hotelIds: [ostrovokClient.getTestHotelHid()],
-          checkin: today.toISOString().split('T')[0],
-          checkout: tomorrow.toISOString().split('T')[0],
-          adults: 2,
+          hotelIds: [String(ostrovokClient.getTestHotelHid())],
+          checkin: today.toISOString().split('T')[0]!,
+          checkout: tomorrow.toISOString().split('T')[0]!,
+          guests: [{ adults: 2 }],
+          residency: 'RU',
         });
         return NextResponse.json({ search });
       }

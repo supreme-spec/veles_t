@@ -7,16 +7,33 @@ interface BookingFormProps {
   hotelName: string;
 }
 
+type BookingStep = 'form' | 'prebook' | 'booking' | 'success' | 'error';
+
+interface GuestData {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+}
+
 export function BookingForm({ hotelHid, hotelName }: BookingFormProps) {
+  const [step, setStep] = useState<BookingStep>('form');
   const [checkin, setCheckin] = useState('');
   const [checkout, setCheckout] = useState('');
   const [adults, setAdults] = useState('2');
   const [children, setChildren] = useState('0');
   const [rooms, setRooms] = useState('1');
   const [loading, setLoading] = useState(false);
-  const [step, setStep] = useState<'form' | 'prebook' | 'success' | 'error'>('form');
   const [error, setError] = useState<string | null>(null);
   const [prebookData, setPrebookData] = useState<any>(null);
+  const [bookHash, setBookHash] = useState<string | null>(null);
+  const [partnerOrderId, setPartnerOrderId] = useState<string | null>(null);
+  const [guestData, setGuestData] = useState<GuestData>({
+    firstName: '',
+    lastName: '',
+    email: '',
+    phone: '',
+  });
 
   const handlePrebook = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,6 +52,7 @@ export function BookingForm({ hotelHid, hotelName }: BookingFormProps) {
       const data = await res.json();
       if (res.ok && data.result) {
         setPrebookData(data.result);
+        setBookHash(data.result.book_hash || data.result.search_hash || `hotel-${hotelHid}-${checkin}-${checkout}`);
         setStep('prebook');
       } else {
         setError(data.error || 'Prebook failed');
@@ -49,23 +67,47 @@ export function BookingForm({ hotelHid, hotelName }: BookingFormProps) {
     }
   };
 
-  const handleConfirm = async () => {
+  const handleCreateBooking = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!bookHash) return;
+
     setLoading(true);
     setError(null);
 
     try {
-      const res = await fetch('/api/booking/confirm', {
+      const partnerOrderIdValue = `order-${DateString()}`;
+      setPartnerOrderId(partnerOrderIdValue);
+
+      const res = await fetch('/api/booking/create', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          bookHash: prebookData?.book_hash || `hotel-${hotelHid}-${checkin}-${checkout}`,
+          bookHash,
+          partnerOrderId: partnerOrderIdValue,
+          rooms: Array.from({ length: Number(rooms) }, () => ({
+            guests: [
+              { adults: Number(adults), children: Number(children) > 0 ? Array.from({ length: Number(children) }, () => 5) : [] },
+            ],
+          })),
+          user: {
+            email: guestData.email,
+            phone: guestData.phone,
+            first_name: guestData.firstName,
+            last_name: guestData.lastName,
+          },
+          partner: {
+            partnerOrderId: partnerOrderIdValue,
+          },
+          language: 'ru',
         }),
       });
+
       const data = await res.json();
-      if (res.ok) {
-        setStep('success');
+      if (res.ok && data.result?.status === 'ok') {
+        setStep('booking');
+        await handleStartBooking(partnerOrderIdValue);
       } else {
-        setError(data.error || 'Booking failed');
+        setError(data.error || 'Create booking failed');
         setStep('error');
       }
     } catch (err) {
@@ -77,11 +119,99 @@ export function BookingForm({ hotelHid, hotelName }: BookingFormProps) {
     }
   };
 
+  const handleStartBooking = async (orderId: string) => {
+    if (!bookHash) return;
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      const res = await fetch('/api/booking/start', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          bookHash,
+          partnerOrderId: orderId,
+          rooms: Array.from({ length: Number(rooms) }, () => ({
+            guests: [
+              { adults: Number(adults), children: Number(children) > 0 ? Array.from({ length: Number(children) }, () => 5) : [] },
+            ],
+          })),
+          user: {
+            email: guestData.email,
+            phone: guestData.phone,
+            first_name: guestData.firstName,
+            last_name: guestData.lastName,
+          },
+          partner: {
+            partnerOrderId: orderId,
+          },
+          paymentType: {
+            type: 'hotel',
+          },
+          language: 'ru',
+        }),
+      });
+
+      const data = await res.json();
+      if (res.ok) {
+        await pollBookingStatus(orderId);
+      } else {
+        setError(data.error || 'Start booking failed');
+        setStep('error');
+      }
+    } catch (err) {
+      console.error(err);
+      setError('Ошибка сети');
+      setStep('error');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const pollBookingStatus = async (orderId: string) => {
+    const maxAttempts = 30;
+    const interval = 3000;
+
+    for (let i = 0; i < maxAttempts; i++) {
+      try {
+        const res = await fetch('/api/booking/check', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ partnerOrderId: orderId }),
+        });
+        const data = await res.json();
+
+        if (data.result?.status === 'ok') {
+          setStep('success');
+          return;
+        }
+
+        if (['soldout', 'provider', 'book_limit', 'insufficient_b2b_balance'].includes(data.result?.error)) {
+          setError(data.result.error || 'Бронирование не подтверждено');
+          setStep('error');
+          return;
+        }
+      } catch (err) {
+        console.error('Poll error:', err);
+      }
+
+      await new Promise(resolve => setTimeout(resolve, interval));
+    }
+
+    setError('Таймаут ожидания подтверждения');
+    setStep('error');
+  };
+
+  function DateString() {
+    return Date.now().toString(36) + Math.random().toString(36).slice(2);
+  }
+
   if (step === 'success') {
     return (
       <div className="bg-green-50 border border-green-200 text-green-800 rounded-xl p-6">
         <h3 className="text-lg font-bold mb-2">Бронирование подтверждено</h3>
-        <p className="text-sm">Ваш заказ в отеле {hotelName} успешно создан.</p>
+        <p className="text-sm">Ваш заказ в отеле {hotelName} успешно создан. Номер заказа: {partnerOrderId}</p>
       </div>
     );
   }
@@ -103,7 +233,7 @@ export function BookingForm({ hotelHid, hotelName }: BookingFormProps) {
 
   if (step === 'prebook' && prebookData) {
     return (
-      <div className="bg-white p-6 border rounded-xl shadow-lg space-y-4">
+      <form onSubmit={handleCreateBooking} className="bg-white p-6 border rounded-xl shadow-lg space-y-4">
         <h3 className="text-lg font-bold">Подтверждение бронирования</h3>
         <div className="text-sm text-slate-600 space-y-1">
           <p>Отель: {hotelName}</p>
@@ -112,22 +242,57 @@ export function BookingForm({ hotelHid, hotelName }: BookingFormProps) {
           <p>Гости: {adults} взр., {children} дет.</p>
           <p>Номеров: {rooms}</p>
         </div>
+        <div className="space-y-3">
+          <input
+            type="text"
+            placeholder="Имя"
+            required
+            value={guestData.firstName}
+            onChange={(e) => setGuestData({ ...guestData, firstName: e.target.value })}
+            className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm"
+          />
+          <input
+            type="text"
+            placeholder="Фамилия"
+            required
+            value={guestData.lastName}
+            onChange={(e) => setGuestData({ ...guestData, lastName: e.target.value })}
+            className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm"
+          />
+          <input
+            type="email"
+            placeholder="Email"
+            required
+            value={guestData.email}
+            onChange={(e) => setGuestData({ ...guestData, email: e.target.value })}
+            className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm"
+          />
+          <input
+            type="tel"
+            placeholder="Телефон"
+            required
+            value={guestData.phone}
+            onChange={(e) => setGuestData({ ...guestData, phone: e.target.value })}
+            className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm"
+          />
+        </div>
         <div className="flex gap-3">
           <button
-            onClick={handleConfirm}
+            type="submit"
             disabled={loading}
             className="flex-1 bg-blue-900 hover:bg-blue-800 text-white font-bold py-3 px-6 rounded-xl transition-colors disabled:opacity-50"
           >
             {loading ? 'Обработка...' : 'Подтвердить бронь'}
           </button>
           <button
+            type="button"
             onClick={() => setStep('form')}
             className="px-4 py-3 border border-slate-200 rounded-xl hover:bg-slate-50"
           >
             Назад
           </button>
         </div>
-      </div>
+      </form>
     );
   }
 
