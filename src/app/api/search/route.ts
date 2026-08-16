@@ -108,9 +108,9 @@ export async function GET(req: Request) {
               residency,
             });
 
-        if (searchResult.status === 'ok' && Array.isArray(searchResult.result?.hotels)) {
+        if (searchResult.status === 'ok' && Array.isArray(searchResult.hotels)) {
           const saved = await Promise.allSettled(
-            searchResult.result.hotels.slice(0, 20).map(upsertHotel)
+            searchResult.hotels.slice(0, 20).map(upsertHotel)
           );
 
           const results = saved

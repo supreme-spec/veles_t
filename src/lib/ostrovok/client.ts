@@ -30,6 +30,8 @@ export class OstrovokClient {
       timeout: 60000,
       headers: {
         'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'User-Agent': 'VelesVoyage/1.0 (+https://veles-voyage.ru)',
         'Authorization': `Basic ${Buffer.from(`${this.config.dKey}:${this.config.apiKey}`).toString('base64')}`,
       },
     });
@@ -38,7 +40,8 @@ export class OstrovokClient {
   async testConnection() {
     try {
       const response = await this.client.get('/b2b/v3/hotel/info/', {
-        params: { hid: 8526976 },
+        params: { hid: 8526976, language: 'ru' },
+        data: { hid: 8526976, language: 'ru' },
       });
       return { success: true, data: response.data };
     } catch (error: any) {
@@ -51,13 +54,14 @@ export class OstrovokClient {
   }
 
   async getHotelDump() {
-    const response = await this.client.get('/b2b/v3/hotel/dump/');
+    const response = await this.client.get('/b2b/v3/hotel/info/dump/', { data: { language: 'ru' } });
     return response.data;
   }
 
   async getHotelContent(hid: number) {
     const response = await this.client.get('/b2b/v3/hotel/info/', {
-      params: { hid },
+      params: { hid, language: 'ru' },
+      data: { hid, language: 'ru' },
     });
     return response.data;
   }
@@ -69,7 +73,10 @@ export class OstrovokClient {
     guests: Array<{ adults: number; children?: number[] }>;
     residency?: string;
   }) {
-    const response = await this.client.post('/b2b/v3/search/serp/region/', params);
+    const response = await this.client.post('/b2b/v3/search/serp/region/', {
+      ...params,
+      language: 'ru',
+    });
     return response.data;
   }
 
@@ -82,7 +89,16 @@ export class OstrovokClient {
     guests: Array<{ adults: number; children?: number[] }>;
     residency?: string;
   }) {
-    const response = await this.client.post('/b2b/v3/search/serp/geo/', params);
+    const response = await this.client.post('/b2b/v3/search/serp/geo/', {
+      latitude: params.lat,
+      longitude: params.lon,
+      radius: params.radius,
+      checkin: params.checkin,
+      checkout: params.checkout,
+      guests: params.guests,
+      residency: params.residency,
+      language: 'ru',
+    });
     return response.data;
   }
 
@@ -93,7 +109,14 @@ export class OstrovokClient {
     guests: Array<{ adults: number; children?: number[] }>;
     residency?: string;
   }) {
-    const response = await this.client.post('/b2b/v3/search/serp/phone/', params);
+    const response = await this.client.post('/b2b/v3/search/serp/hotels/', {
+      hids: params.hotelIds.map(id => Number(id)),
+      checkin: params.checkin,
+      checkout: params.checkout,
+      guests: params.guests,
+      residency: params.residency,
+      language: 'ru',
+    });
     return response.data;
   }
 
@@ -104,28 +127,41 @@ export class OstrovokClient {
     guests: Array<{ adults: number; children?: number[] }>;
     residency?: string;
   }) {
-    const response = await this.client.post('/b2b/v3/search/hp/', params);
+    const response = await this.client.post('/b2b/v3/search/hp/', {
+      ...params,
+      language: 'ru',
+    });
     return response.data;
   }
 
   async prebook(params: { bookHash: string; priceIncreasePercent?: number }) {
-    const response = await this.client.post('/b2b/v3/hotel/prebook', params);
+    const response = await this.client.post('/b2b/v3/hotel/prebook', {
+      ...params,
+      language: 'ru',
+    });
     return response.data;
   }
 
   async createBookingProcess(params: any) {
-    const response = await this.client.post('/b2b/v3/hotel/order/booking/form/', params);
+    const response = await this.client.post('/b2b/v3/hotel/order/booking/form/', {
+      ...params,
+      language: 'ru',
+    });
     return response.data;
   }
 
   async startBookingProcess(params: any) {
-    const response = await this.client.post('/b2b/v3/hotel/order/booking/finish/', params);
+    const response = await this.client.post('/b2b/v3/hotel/order/booking/finish/', {
+      ...params,
+      language: 'ru',
+    });
     return response.data;
   }
 
   async checkBookingProcess(partnerOrderId: string) {
     const response = await this.client.post('/b2b/v3/hotel/order/booking/finish/status/', {
       partnerOrderId,
+      language: 'ru',
     });
     return response.data;
   }
@@ -133,12 +169,16 @@ export class OstrovokClient {
   async cancelBooking(partnerOrderId: string) {
     const response = await this.client.post('/b2b/v3/hotel/order/cancel/', {
       partnerOrderId,
+      language: 'ru',
     });
     return response.data;
   }
 
   async createCreditCardToken(params: any) {
-    const response = await this.client.post('/b2b/v3/hotel/order/booking/card-token/', params);
+    const response = await this.client.post('/b2b/v3/hotel/order/booking/card-token/', {
+      ...params,
+      language: 'ru',
+    });
     return response.data;
   }
 
