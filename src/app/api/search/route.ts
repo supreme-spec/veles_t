@@ -41,6 +41,8 @@ async function upsertHotel(h: any) {
     amenities: Array.isArray(h.amenities) ? h.amenities : [],
     contacts: h.contacts || {},
     images: Array.isArray(h.images) ? h.images : [],
+    cancellationPolicies: h.metapolicy_struct?.cancellation_penalties || null,
+    roomsData: h.metapolicy_struct?.meal ? { mealTypes: h.metapolicy_struct.meal, taxes: h.metapolicy_struct.tax_data?.taxes || [] } : null,
     status,
     source: 'ostrovok',
     lastSyncedAt: new Date(),
@@ -62,6 +64,8 @@ export async function GET(req: Request) {
   const checkin = searchParams.get('checkin');
   const checkout = searchParams.get('checkout');
   const adults = Number(searchParams.get('adults') || '2');
+  const childrenParam = searchParams.get('children');
+  const children: number[] = childrenParam ? JSON.parse(childrenParam) : [];
   const residency = searchParams.get('residency') || 'RU';
 
   if (!query) {
@@ -70,7 +74,7 @@ export async function GET(req: Request) {
 
   try {
     const lowerQuery = query.toLowerCase().trim();
-    const cacheKey = `search:${Buffer.from(`${lowerQuery}:${checkin}:${checkout}:${adults}:${residency}`).toString('base64')}`;
+    const cacheKey = `search:${Buffer.from(`${lowerQuery}:${checkin}:${checkout}:${adults}:${children}:${residency}`).toString('base64')}`;
     const cached = await getCached<any>(cacheKey);
     if (cached) {
       return NextResponse.json({ ...cached, cached: true });
@@ -95,7 +99,7 @@ export async function GET(req: Request) {
               radius: 20,
               checkin: finalCheckin,
               checkout: finalCheckout,
-              guests: [{ adults }],
+              guests: [{ adults, children }],
               residency,
             })
           : await ostrovokClient.searchByGeo({
@@ -104,7 +108,7 @@ export async function GET(req: Request) {
               radius: 50,
               checkin: finalCheckin,
               checkout: finalCheckout,
-              guests: [{ adults }],
+              guests: [{ adults, children }],
               residency,
             });
 

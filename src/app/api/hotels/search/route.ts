@@ -42,6 +42,8 @@ export async function GET(req: Request) {
         images: hotels.images,
         amenities: hotels.amenities,
         description: hotels.description,
+        cancellationPolicies: hotels.cancellationPolicies,
+        roomsData: hotels.roomsData,
       })
       .from(hotels)
       .where(and(...conditions))

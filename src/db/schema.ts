@@ -49,6 +49,8 @@ export const hotels = pgTable('hotels', {
   amenities: jsonb('amenities').$type<string[]>(),
   contacts: jsonb('contacts'),
   images: jsonb('images').$type<string[]>(),
+  cancellationPolicies: jsonb('cancellation_policies'),
+  roomsData: jsonb('rooms_data'),
   status: hotelStatusEnum('status').default('ACTIVE').notNull(),
   source: text('source').default('ostrovok'),
   lastSyncedAt: timestamp('last_synced_at').notNull(),

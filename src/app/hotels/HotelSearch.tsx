@@ -57,6 +57,8 @@ export function HotelSearch() {
   const [checkin, setCheckin] = useState('');
   const [checkout, setCheckout] = useState('');
   const [adults, setAdults] = useState('2');
+  const [childrenCount, setChildrenCount] = useState('0');
+  const [childrenAges, setChildrenAges] = useState<number[]>([]);
   const [results, setResults] = useState<Hotel[]>([]);
   const [loading, setLoading] = useState(false);
   const [searched, setSearched] = useState(false);
@@ -74,6 +76,9 @@ export function HotelSearch() {
       if (checkin) url.searchParams.set('checkin', checkin);
       if (checkout) url.searchParams.set('checkout', checkout);
       url.searchParams.set('adults', adults);
+      if (childrenCount !== '0') {
+        url.searchParams.set('children', JSON.stringify(childrenAges));
+      }
 
       const res = await fetch(url.toString());
       const data = await res.json();
@@ -89,6 +94,18 @@ export function HotelSearch() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleChildrenCountChange = (count: string) => {
+    const num = Number(count);
+    setChildrenCount(count);
+    setChildrenAges(prev => {
+      if (num === 0) return [];
+      if (num > prev.length) {
+        return [...prev, ...Array.from({ length: num - prev.length }, () => 5)];
+      }
+      return prev.slice(0, num);
+    });
   };
 
   const handleCityClick = (city: { name: string; slug: string; countrySlug: string }) => {
@@ -161,6 +178,40 @@ export function HotelSearch() {
                   ))}
                 </select>
               </div>
+              <div>
+                <label className="block text-xs text-slate-500 mb-1">Дети</label>
+                <select
+                  value={childrenCount}
+                  onChange={(e) => handleChildrenCountChange(e.target.value)}
+                  className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                >
+                  {[0, 1, 2, 3, 4].map((n) => (
+                    <option key={n} value={n}>{n}</option>
+                  ))}
+                </select>
+              </div>
+              {childrenCount !== '0' && (
+                <div className="col-span-full">
+                  <label className="block text-xs text-slate-500 mb-1">Возраст детей</label>
+                  <div className="flex gap-2 flex-wrap">
+                    {childrenAges.map((age, idx) => (
+                      <input
+                        key={idx}
+                        type="number"
+                        min="0"
+                        max="17"
+                        value={age}
+                        onChange={(e) => {
+                          const newAges = [...childrenAges];
+                          newAges[idx] = Number(e.target.value);
+                          setChildrenAges(newAges);
+                        }}
+                        className="w-16 px-2 py-1 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm"
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
             <button
               type="submit"

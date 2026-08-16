@@ -17,6 +17,8 @@ interface Hotel {
   amenities: string[];
   images?: any[];
   ostrovokHid?: number;
+  cancellationPolicies?: any;
+  roomsData?: any;
 }
 
 interface Review {
@@ -189,7 +191,12 @@ export default function HotelClient({ slug, city, country }: HotelClientProps) {
         </div>
 
         <div className="w-full lg:w-96">
-          <BookingForm hotelHid={hotel.ostrovokHid || Number(hotel.id)} hotelName={hotel.name} />
+          <BookingForm 
+            hotelHid={hotel.ostrovokHid || Number(hotel.id)} 
+            hotelName={hotel.name}
+            cancellationPolicies={hotel.cancellationPolicies}
+            taxes={hotel.roomsData?.taxes || []}
+          />
         </div>
       </div>
     </>
