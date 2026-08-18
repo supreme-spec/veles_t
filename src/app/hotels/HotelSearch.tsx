@@ -132,16 +132,16 @@ export function HotelSearch() {
   return (
     <>
       <form onSubmit={handleSearch} className="max-w-3xl mx-auto mb-12">
-        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-6 border border-gray-200 dark:border-gray-700">
-          <div className="flex flex-col gap-4">
-            <input
-              type="text"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Город, отель или страна"
-              className="flex-1 px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            />
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-6 border border-gray-200 dark:border-gray-700">
+            <div className="flex flex-col gap-4">
+              <input
+                type="text"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Город, отель или страна"
+                className="flex-1 px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div>
                 <label className="block text-xs text-slate-500 mb-1">Заезд</label>
                 <input
@@ -214,9 +214,9 @@ export function HotelSearch() {
             >
               {loading ? 'Поиск...' : 'Найти отели'}
             </button>
+            </div>
           </div>
-        </div>
-      </form>
+        </form>
 
       <div className="max-w-3xl mx-auto mb-8">
         <p className="text-xs text-slate-500 mb-2">Популярные направления:</p>
