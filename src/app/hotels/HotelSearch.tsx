@@ -171,9 +171,12 @@ export function HotelSearch() {
                 type="text"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
+                onFocus={() => setShowSuggestions(true)}
                 placeholder="Город, отель или страна"
-                className="flex-1 px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                autoComplete="off"
               />
+
               {showSuggestions && suggestions.length > 0 && (
                 <div
                   ref={suggestionsRef}
@@ -190,13 +193,9 @@ export function HotelSearch() {
                         {suggestion.type === 'city' ? '🏙️' : '🏨'}
                       </span>
                       <div className="flex-1">
-                        <div className="font-medium text-gray-900 dark:text-white">
-                          {suggestion.text}
-                        </div>
+                        <div className="font-medium text-gray-900 dark:text-white">{suggestion.text}</div>
                         {suggestion.type === 'hotel' && suggestion.city && (
-                          <div className="text-xs text-gray-500">
-                            {suggestion.city}
-                          </div>
+                          <div className="text-xs text-gray-500">{suggestion.city}</div>
                         )}
                       </div>
                       <span className="text-xs text-gray-400 uppercase">
@@ -262,9 +261,7 @@ export function HotelSearch() {
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                 {childrenAges.map((age, index) => (
                   <div key={index}>
-                    <label className="block text-xs text-slate-500 mb-1">
-                      Возраст ребёнка {index + 1}
-                    </label>
+                    <label className="block text-xs text-slate-500 mb-1">Возраст ребёнка {index + 1}</label>
                     <select
                       value={age}
                       onChange={(e) => handleChildAgeChange(index, parseInt(e.target.value))}

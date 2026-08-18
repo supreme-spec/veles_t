@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/db';
 import { hotels } from '@/db/schema';
-import { eq, sql } from 'drizzle-orm';
+import { sql } from 'drizzle-orm';
 
 export const runtime = 'nodejs';
 
@@ -10,6 +10,7 @@ const POPULAR_CITIES = [
   { city: 'Санкт-Петербург', country: 'Россия', slug: 'saint-petersburg' },
   { city: 'Сочи', country: 'Россия', slug: 'sochi' },
   { city: 'Казань', country: 'Россия', slug: 'kazan' },
+  { city: 'Калининград', country: 'Россия', slug: 'kaliningrad' },
   { city: 'Дубай', country: 'ОАЭ', slug: 'dubai' },
   { city: 'Стамбул', country: 'Турция', slug: 'istanbul' },
   { city: 'Анталья', country: 'Турция', slug: 'antalya' },
@@ -51,7 +52,7 @@ export async function GET(request: Request) {
         city: c.city,
         country: c.country,
         type: 'city' as const,
-        source: 'popular',
+        source: 'popular' as const,
       }));
 
     let dbCities: any[] = [];
@@ -78,7 +79,7 @@ export async function GET(request: Request) {
         city: c.city,
         country: c.country,
         type: 'city' as const,
-        source: 'db',
+        source: 'db' as const,
         hotelsCount: Number(c.count),
       }));
 
@@ -101,7 +102,7 @@ export async function GET(request: Request) {
         hotelSlug: h.slug,
         city: h.city,
         type: 'hotel' as const,
-        source: 'db',
+        source: 'db' as const,
       }));
     } catch (e) {
       console.error('[SUGGESTIONS HOTELS ERROR]:', e);

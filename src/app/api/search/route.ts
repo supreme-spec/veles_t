@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { ostrovokClient } from '@/lib/ostrovok/client';
 import { db } from '@/db';
 import { hotels } from '@/db/schema';
-import { eq, sql, and } from 'drizzle-orm';
+import { eq, sql } from 'drizzle-orm';
 import { getCached, setCached } from '@/lib/redis';
 
 export const runtime = 'nodejs';
@@ -116,7 +116,6 @@ export async function GET(req: Request) {
         results: popularHotels,
         source: 'popular',
         cached: false,
-        message: 'Покажите город для поиска отелей',
       });
     }
 
@@ -163,7 +162,7 @@ export async function GET(req: Request) {
 
           const results = saved
             .filter((r): r is PromiseFulfilledResult<any> => r.status === 'fulfilled')
-            .map(r => r.value)
+            .map((r) => r.value)
             .filter(Boolean);
 
           const payload = { results, source: 'ostrovok', cached: false };
