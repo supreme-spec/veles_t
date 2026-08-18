@@ -191,3 +191,16 @@ export function generateCitySlug(name: string): string {
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-+|-+$/g, '');
 }
+
+export function slugify(text: string): string {
+  const key = text.toLowerCase().trim();
+  const transliterated = key
+    .split('')
+    .map((ch) => RU_TO_LATIN[ch] ?? ch)
+    .join('');
+
+  return transliterated
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '') || text.toLowerCase();
+}

@@ -18,18 +18,29 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'bookHash is required' }, { status: 400 });
     }
 
-    const result = await ostrovokClient.startBookingProcess({
-      bookHash,
-      partnerOrderId,
-      language: language || 'ru',
-      rooms,
-      user,
-      partner: partner || { partnerOrderId },
-      paymentType,
-      returnPath,
-    });
+    try {
+      const result = await ostrovokClient.startBookingProcess({
+        bookHash,
+        partnerOrderId,
+        language: language || 'ru',
+        rooms,
+        user,
+        partner: partner || { partnerOrderId },
+        paymentType,
+        returnPath,
+      });
 
-    return NextResponse.json({ result });
+      return NextResponse.json({ result });
+    } catch (error: any) {
+      if (error.response?.status >= 500) {
+        return NextResponse.json(
+          { status: 'in_progress', message: 'Please check booking status via /api/booking/check' },
+          { status: 202 }
+        );
+      }
+      console.error('[START BOOKING ERROR]:', error);
+      return NextResponse.json({ error: error.message || 'Start booking failed' }, { status: 500 });
+    }
   } catch (error: any) {
     console.error('[START BOOKING ERROR]:', error);
     return NextResponse.json({ error: error.message || 'Start booking failed' }, { status: 500 });

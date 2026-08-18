@@ -1,5 +1,9 @@
 import type { Metadata } from 'next';
 import HotelClient from './HotelClient';
+import { db } from '@/db';
+import { hotels } from '@/db/schema';
+import { eq } from 'drizzle-orm';
+import { slugify } from '@/lib/slugify';
 
 const SITE_URL = 'https://veles-voyage.ru';
 
@@ -14,10 +18,19 @@ interface HotelPageProps {
 }
 
 export async function generateStaticParams() {
-  return [
-    { country: 'russia', city: 'moscow', hotel: 'grand-hotel-metropol' },
-    { country: 'russia', city: 'sochi', hotel: 'test-resort' },
-  ];
+  const activeHotels = await db
+    .select()
+    .from(hotels)
+    .where(eq(hotels.status, 'ACTIVE'))
+    .limit(100);
+
+  return activeHotels
+    .filter((h) => h.seoSlug && h.city && h.country)
+    .map((h) => ({
+      country: slugify(h.country!),
+      city: slugify(h.city!),
+      hotel: h.seoSlug,
+    }));
 }
 
 export async function generateMetadata({ params }: HotelPageProps): Promise<Metadata> {

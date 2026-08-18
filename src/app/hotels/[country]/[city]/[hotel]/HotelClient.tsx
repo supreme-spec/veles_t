@@ -50,12 +50,11 @@ export default function HotelClient({ slug, city, country }: HotelClientProps) {
       try {
         setLoading(true);
         setError(null);
-        const res = await fetch(`/api/hotels/search?slug=${encodeURIComponent(slug)}&city=${encodeURIComponent(city)}`);
+        const res = await fetch(`/api/hotels/${encodeURIComponent(slug)}`);
         const data = await res.json();
-        if (data.results && data.results[0]) {
-          const h = data.results[0];
-          setHotel(h);
-          await loadReviews(h.ostrovokHid || Number(h.id));
+        if (data.hotel) {
+          setHotel(data.hotel);
+          await loadReviews(data.hotel.ostrovokHid || Number(data.hotel.id));
         } else {
           setError('Отель не найден');
         }
@@ -68,7 +67,7 @@ export default function HotelClient({ slug, city, country }: HotelClientProps) {
     }
 
     loadHotel();
-  }, [slug, city]);
+  }, [slug]);
 
   const loadReviews = async (hotelHid: number) => {
     try {

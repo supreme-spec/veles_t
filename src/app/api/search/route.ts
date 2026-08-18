@@ -4,6 +4,7 @@ import { db } from '@/db';
 import { hotels } from '@/db/schema';
 import { eq, sql } from 'drizzle-orm';
 import { getCached, setCached } from '@/lib/redis';
+import { slugify } from '@/lib/slugify';
 
 export const runtime = 'nodejs';
 
@@ -21,6 +22,7 @@ async function upsertHotel(h: any) {
   if (!h?.hid) return null;
   const normalizedName = String(h.name || '').toLowerCase().trim();
   const slug = `hotel-${h.hid}`;
+  const seoSlug = slugify(h.name || `hotel-${h.hid}`);
   const status = 'ACTIVE' as const;
   const payload = {
     ostrovokHid: h.hid,
@@ -28,6 +30,7 @@ async function upsertHotel(h: any) {
     name: h.name || `Отель ${h.hid}`,
     normalizedName: normalizedName || `hotel ${h.hid}`,
     slug,
+    seoSlug,
     country: h.country?.name || 'Неизвестно',
     region: h.region?.name || null,
     city: h.city?.name || 'Неизвестно',

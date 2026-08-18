@@ -37,6 +37,7 @@ export const hotels = pgTable('hotels', {
   name: text('name').notNull(),
   normalizedName: text('normalized_name').notNull(),
   slug: text('slug').unique().notNull(),
+  seoSlug: text('seo_slug').unique(),
   country: text('country'),
   region: text('region'),
   city: text('city'),

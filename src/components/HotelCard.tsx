@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import type { Hotel } from '@/db/schema';
+import { slugify } from '@/lib/slugify';
 
 interface HotelCardProps {
   hotel: Hotel & {
@@ -11,9 +12,13 @@ interface HotelCardProps {
 
 export function HotelCard({ hotel }: HotelCardProps) {
   const mainImage = (hotel.images as any)?.[0];
+  const countrySlug = slugify(hotel.country || '');
+  const citySlug = slugify(hotel.city || '');
+  const hotelSlug = slugify(hotel.name || '');
+  const href = `/hotels/${countrySlug}/${citySlug}/${hotelSlug}`;
 
   return (
-    <Link href={`/hotels/${hotel.slug}`} className="block group">
+    <Link href={href} className="block group">
       <div className="bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow">
         <div className="relative aspect-[4/3] bg-gray-100">
           {mainImage?.medium ? (

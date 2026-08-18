@@ -10,8 +10,9 @@ export async function GET(req: Request) {
   const city = searchParams.get('city');
   const country = searchParams.get('country');
   const stars = searchParams.get('stars');
-  const slug = searchParams.get('slug');
-  const limit = Number(searchParams.get('limit') || '20');
+    const slug = searchParams.get('slug');
+    const name = searchParams.get('name');
+    const limit = Number(searchParams.get('limit') || '20');
 
   try {
     const conditions = [eq(hotels.status, 'ACTIVE')];
@@ -27,6 +28,9 @@ export async function GET(req: Request) {
     }
     if (slug) {
       conditions.push(eq(hotels.slug, slug));
+    }
+    if (name) {
+      conditions.push(sql`${hotels.name} ILIKE ${`%${name}%`}`);
     }
 
     const results = await db
