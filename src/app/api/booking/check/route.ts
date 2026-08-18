@@ -4,10 +4,19 @@ import { checkRateLimit, getUserKey } from '@/lib/rate-limiter';
 
 export const runtime = 'nodejs';
 
-const FINAL_ERRORS = ['block', 'charge', '3ds', 'soldout', 'provider', 'book_limit'];
-const CUTOFF_MS = 5 * 60 * 1000;
-const POLL_INTERVAL_MS = 3000;
-const MAX_ATTEMPTS = Math.floor(CUTOFF_MS / POLL_INTERVAL_MS);
+const FINAL_ERRORS = [
+  'block',
+  'charge',
+  '3ds',
+  'soldout',
+  'provider',
+  'book_limit',
+  'contract_mismatch',
+  'hotel_not_found',
+  'rate_not_found',
+  'insufficient_b2b_balance',
+];
+const RETRYABLE_ERRORS = ['timeout', 'unknown'];
 
 export async function POST(req: Request) {
   const userKey = getUserKey(req);
@@ -17,55 +26,75 @@ export async function POST(req: Request) {
 
   try {
     const body = await req.json();
-    const { partnerOrderId, maxAttempts = MAX_ATTEMPTS, intervalMs = POLL_INTERVAL_MS } = body;
+    const { partnerOrderId, maxAttempts = 30, intervalMs = 3000, singleCall = false } = body;
 
     if (!partnerOrderId) {
       return NextResponse.json({ error: 'partnerOrderId is required' }, { status: 400 });
     }
 
-    const attempts = Math.min(maxAttempts, MAX_ATTEMPTS);
-    const startTime = Date.now();
+    if (singleCall) {
+      const result = await ostrovokClient.checkBookingProcess(partnerOrderId);
+      return NextResponse.json({ result, mode: 'single' });
+    }
 
-    for (let attempt = 1; attempt <= attempts; attempt++) {
+    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
       try {
         const result = await ostrovokClient.checkBookingProcess(partnerOrderId);
+        const status = result?.result?.status || result?.status;
+        const error = result?.result?.error || result?.error;
 
-        if (result.status === 'ok') {
+        if (status === 'ok') {
           return NextResponse.json({
             success: true,
+            confirmed: true,
             attempt,
-            result,
-            partnerOrderId: result.partner_order_id || partnerOrderId,
-            ostrovokOrderId: result.ostrovok_order_id,
+            result: result.result || result,
+            partnerOrderId: result.result?.partner_order_id || partnerOrderId,
+            ostrovokOrderId: result.result?.ostrovok_order_id,
           });
         }
 
-        if (FINAL_ERRORS.includes(result.error)) {
-          return NextResponse.json({
-            success: false,
-            failed: true,
-            error: result.error,
-            message: 'Бронирование отклонено поставщиком',
-            attempt,
-            result,
-          }, { status: 400 });
+        if (error && FINAL_ERRORS.includes(error)) {
+          return NextResponse.json(
+            {
+              success: false,
+              failed: true,
+              error,
+              message: getErrorMessage(error),
+              attempt,
+              result: result.result || result,
+            },
+            { status: 400 }
+          );
         }
 
-        if (attempt < attempts) {
+        if (status === 'processing' || (error && RETRYABLE_ERRORS.includes(error))) {
+          if (attempt < maxAttempts) {
+            await new Promise(resolve => setTimeout(resolve, intervalMs));
+            continue;
+          }
+        }
+
+        if (attempt < maxAttempts) {
           await new Promise(resolve => setTimeout(resolve, intervalMs));
           continue;
         }
 
-        return NextResponse.json({
-          success: false,
-          status: result.status,
-          error: result.error,
-          attempt,
-          maxAttempts: attempts,
-          message: 'Бронирование ещё обрабатывается, проверьте статус позже',
-        });
+        return NextResponse.json(
+          {
+            success: false,
+            stillProcessing: true,
+            status,
+            error,
+            attempt,
+            maxAttempts,
+            message: 'Бронирование ещё обрабатывается',
+            result: result.result || result,
+          },
+          { status: 202 }
+        );
       } catch (error: any) {
-        if (error.response?.status >= 500 && attempt < attempts) {
+        if ((error.response?.status >= 500 || !error.response?.status) && attempt < maxAttempts) {
           await new Promise(resolve => setTimeout(resolve, intervalMs));
           continue;
         }
@@ -73,14 +102,34 @@ export async function POST(req: Request) {
       }
     }
 
-    return NextResponse.json({
-      success: false,
-      error: 'booking_timeout',
-      message: 'Превышено время ожидания подтверждения бронирования',
-      maxAttempts: attempts,
-    }, { status: 504 });
+    return NextResponse.json(
+      {
+        success: false,
+        error: 'booking_timeout',
+        maxAttempts,
+        partnerOrderId,
+        message: 'Превышено время ожидания подтверждения',
+      },
+      { status: 504 }
+    );
   } catch (error: any) {
     console.error('[CHECK BOOKING ERROR]:', error);
-    return NextResponse.json({ error: error.message || 'Check booking failed' }, { status: 500 });
+    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   }
+}
+
+function getErrorMessage(errorCode: string): string {
+  const messages: Record<string, string> = {
+    block: 'Бронирование отклонено. Свяжитесь с поддержкой.',
+    charge: 'Ошибка оплаты. Деньги не списаны.',
+    '3ds': 'Не удалось пройти 3DS. Попробуйте ещё раз.',
+    soldout: 'Номер больше недоступен.',
+    provider: 'Ошибка поставщика. Попробуйте позже.',
+    book_limit: 'Превышен лимит бронирований.',
+    contract_mismatch: 'Ошибка контракта. Свяжитесь с поддержкой.',
+    hotel_not_found: 'Отель не найден.',
+    rate_not_found: 'Тариф больше недоступен.',
+    insufficient_b2b_balance: 'Ошибка бронирования. Свяжитесь с поддержкой.',
+  };
+  return messages[errorCode] || `Ошибка: ${errorCode}`;
 }

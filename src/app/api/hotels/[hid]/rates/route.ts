@@ -5,25 +5,23 @@ import { checkRateLimit, getUserKey } from '@/lib/rate-limiter';
 
 export const runtime = 'nodejs';
 
-export async function POST(
-  req: Request,
-  { params }: { params: Promise<{ hid: string }> }
-) {
+export async function POST(req: Request, { params }: { params: Promise<{ hid: string }> }) {
   const userKey = getUserKey(req);
-  if (!(await checkRateLimit(`hotelpage:${userKey}`, 10, 60_000))) {
+  if (!(await checkRateLimit(`hotelpage:${userKey}`, 15, 60_000))) {
     return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
   }
 
   try {
     const { hid } = await params;
     const body = await req.json();
-    const { checkin, checkout, guests, residency = 'RU' } = body;
+    const { checkin, checkout, guests, residency = 'RU', timeout = 30 } = body;
 
     if (!checkin || !checkout) {
-      return NextResponse.json(
-        { error: 'checkin and checkout are required' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'checkin and checkout are required' }, { status: 400 });
+    }
+
+    if (!hid || isNaN(Number(hid))) {
+      return NextResponse.json({ error: 'Invalid hid' }, { status: 400 });
     }
 
     const cacheKey = `hotelpage:${hid}:${checkin}:${checkout}:${JSON.stringify(guests || [])}:${residency}`;
@@ -38,18 +36,21 @@ export async function POST(
       checkout,
       guests: guests || [{ adults: 2 }],
       residency,
-      timeout: 30,
+      timeout,
     });
 
     if (result.status !== 'ok') {
       return NextResponse.json({
+        success: false,
         error: result.error || 'Hotelpage failed',
       }, { status: 500 });
     }
 
+    const hotelData = result.result?.results?.[0] || null;
     const payload = {
-      hotel: result.result?.results?.[0] || null,
-      rates: result.result?.results?.[0]?.rates || [],
+      success: true,
+      hotel: hotelData,
+      rates: hotelData?.rates || [],
       cached: false,
     };
 
@@ -57,8 +58,6 @@ export async function POST(
     return NextResponse.json(payload);
   } catch (error: any) {
     console.error('[HOTELPAGE RATES ERROR]:', error);
-    return NextResponse.json({
-      error: error.message || 'Hotelpage failed',
-    }, { status: 500 });
+    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   }
 }
