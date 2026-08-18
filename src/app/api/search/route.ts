@@ -91,8 +91,6 @@ export async function GET(req: Request) {
 
   try {
     if (!query) {
-      console.log('[SEARCH] Empty query — returning popular hotels from DB');
-
       const popularHotels = await db
         .select({
           id: hotels.id,

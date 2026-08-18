@@ -22,10 +22,62 @@ interface Hotel {
   slug?: string;
 }
 
+function getDefaultCheckDates() {
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  const dayAfter = new Date();
+  dayAfter.setDate(dayAfter.getDate() + 4);
+  return {
+    checkin: tomorrow.toISOString().split('T')[0],
+    checkout: dayAfter.toISOString().split('T')[0],
+  };
+}
+
+const defaultDates = getDefaultCheckDates();
+
+const CITY_SLUGS: Record<string, string> = {
+  'москва': 'moscow',
+  'санкт-петербург': 'saint-petersburg',
+  'сочи': 'sochi',
+  'казань': 'kazan',
+  'дубай': 'dubai',
+  'стамбул': 'istanbul',
+  'бангкок': 'bangkok',
+};
+
+const COUNTRY_SLUGS: Record<string, string> = {
+  'россия': 'russia',
+  'турция': 'turkey',
+  'оаэ': 'uae',
+  'таиланд': 'thailand',
+  'египет': 'egypt',
+  'испания': 'spain',
+  'италия': 'italy',
+  'греция': 'greece',
+};
+
+function slugify(text: string): string {
+  return text
+    .toLowerCase()
+    .replace(/[ё]/g, 'e')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '') || text.toLowerCase();
+}
+
+const CITIES = [
+  { name: 'Москва', country: 'Россия', slug: 'moscow', countrySlug: 'russia' },
+  { name: 'Санкт-Петербург', country: 'Россия', slug: 'saint-petersburg', countrySlug: 'russia' },
+  { name: 'Сочи', country: 'Россия', slug: 'sochi', countrySlug: 'russia' },
+  { name: 'Казань', country: 'Россия', slug: 'kazan', countrySlug: 'russia' },
+  { name: 'Дубай', country: 'ОАЭ', slug: 'dubai', countrySlug: 'uae' },
+  { name: 'Стамбул', country: 'Турция', slug: 'istanbul', countrySlug: 'turkey' },
+  { name: 'Бангкок', country: 'Таиланд', slug: 'bangkok', countrySlug: 'thailand' },
+];
+
 export function HotelSearch() {
   const [query, setQuery] = useState('');
-  const [checkin, setCheckin] = useState('');
-  const [checkout, setCheckout] = useState('');
+  const [checkin, setCheckin] = useState(defaultDates.checkin);
+  const [checkout, setCheckout] = useState(defaultDates.checkout);
   const [adults, setAdults] = useState('2');
   const [childrenCount, setChildrenCount] = useState('0');
   const [childrenAges, setChildrenAges] = useState<number[]>([]);
@@ -39,16 +91,6 @@ export function HotelSearch() {
   const inputRef = useRef<HTMLInputElement>(null);
   const suggestionsRef = useRef<HTMLDivElement>(null);
   const debounceRef = useRef<NodeJS.Timeout | null>(null);
-
-  useEffect(() => {
-    const tomorrow = new Date();
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    const dayAfter = new Date();
-    dayAfter.setDate(dayAfter.getDate() + 4);
-
-    setCheckin(tomorrow.toISOString().split('T')[0]);
-    setCheckout(dayAfter.toISOString().split('T')[0]);
-  }, []);
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
@@ -96,18 +138,6 @@ export function HotelSearch() {
     inputRef.current?.blur();
   };
 
-  const handleChildrenCountChange = (count: string) => {
-    setChildrenCount(count);
-    const numCount = parseInt(count);
-    setChildrenAges(Array(numCount).fill(5));
-  };
-
-  const handleChildAgeChange = (index: number, age: number) => {
-    const newAges = [...childrenAges];
-    newAges[index] = age;
-    setChildrenAges(newAges);
-  };
-
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -146,6 +176,33 @@ export function HotelSearch() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleChildrenCountChange = (count: string) => {
+    setChildrenCount(count);
+    const numCount = parseInt(count);
+    setChildrenAges(Array(numCount).fill(5));
+  };
+
+  const handleChildAgeChange = (index: number, age: number) => {
+    const newAges = [...childrenAges];
+    newAges[index] = age;
+    setChildrenAges(newAges);
+  };
+
+  const handleCityClick = (city: { name: string; slug: string; countrySlug: string }) => {
+    setQuery(city.name);
+    setShowSuggestions(false);
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const dayAfter = new Date();
+    dayAfter.setDate(dayAfter.getDate() + 2);
+    setCheckin(tomorrow.toISOString().split('T')[0]!);
+    setCheckout(dayAfter.toISOString().split('T')[0]!);
+    setAdults('2');
+    setSearched(false);
+    setResults([]);
+    setError(null);
   };
 
   const getOstrovokUrl = (hotel: Hotel) => {
@@ -288,6 +345,22 @@ export function HotelSearch() {
           </div>
         </div>
       </form>
+
+      <div className="max-w-3xl mx-auto mb-8">
+        <p className="text-xs text-slate-500 mb-2">Популярные направления:</p>
+        <div className="flex flex-wrap gap-2">
+          {CITIES.map((city) => (
+            <button
+              key={city.slug}
+              type="button"
+              onClick={() => handleCityClick(city)}
+              className="text-xs bg-slate-50 hover:bg-slate-100 text-slate-700 px-3 py-1.5 rounded-lg border border-slate-200 transition-colors"
+            >
+              {city.name}
+            </button>
+          ))}
+        </div>
+      </div>
 
       {error && (
         <div className="max-w-3xl mx-auto mb-6 p-4 bg-red-50 border border-red-200 text-red-800 rounded-xl">
