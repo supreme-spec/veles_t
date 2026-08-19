@@ -57,20 +57,20 @@ export const BookingSteps: React.FC = () => {
 
   return (
     <section className="py-12 md:py-16 bg-white dark:bg-gray-900">
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-2 text-center">
           Как забронировать тур в 5 шагов
         </h2>
         <p className="text-center text-gray-600 dark:text-gray-300 mb-8">
           Простая и прозрачная процедура бронирования с поддержкой 24/7.
         </p>
-        <ol className="space-y-4">
+        <ol className="grid gap-4 md:grid-cols-3 xl:grid-cols-5">
           {STEPS.map((step, i) => (
             <li
               key={i}
-              className="flex gap-4 items-start bg-gray-50 dark:bg-gray-800 rounded-2xl p-5 border border-gray-100 dark:border-gray-700"
+              className="h-full flex gap-4 items-start bg-gray-50 dark:bg-gray-800 rounded-2xl p-5 border border-gray-100 dark:border-gray-700"
             >
-              <div className="flex-shrink-0 w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-lg">
+              <div className="flex-shrink-0 w-10 h-10 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold text-lg">
                 {i + 1}
               </div>
               <div>

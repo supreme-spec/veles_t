@@ -447,9 +447,11 @@ export default async function Home() {
                       />
                     </div>
                     <div className="p-3 sm:p-4 md:p-5 lg:p-6 flex flex-col flex-grow relative z-10">
-                      <h3 className="text-sm sm:text-base md:text-lg lg:text-xl font-bold text-gray-900 dark:text-white mb-1.5 sm:mb-2">
-                        Сколько стоит тур {dest.preposition ? dest.preposition + ' ' : 'в '}
-                        {dest.nameAccusative || dest.name} и нужна ли виза?
+                      <h3 className="text-base sm:text-lg md:text-xl font-bold text-gray-900 dark:text-white mb-1.5 sm:mb-2">
+                        {dest.name}
+                        <span className="block text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400 mt-0.5">
+                          {dest.visaRequired ? 'нужна виза' : 'без визы'} · {dest.priceNote}
+                        </span>
                       </h3>
                       <p className="text-xs sm:text-sm md:text-base text-gray-600 dark:text-gray-300 mb-2 sm:mb-3 md:mb-4 flex-grow">
                         {dest.description}
@@ -459,12 +461,12 @@ export default async function Home() {
                           const price = dest.estimatedCost;
                           if (!price)
                             return (
-                              <span className="text-sm sm:text-base md:text-lg font-extrabold text-indigo-600 dark:text-indigo-400 mb-2 sm:mb-3 md:mb-4">
+                                <span className="text-lg sm:text-xl md:text-2xl font-extrabold text-indigo-600 dark:text-indigo-400 mb-2 sm:mb-3 md:mb-4">
                                 Цена по запросу
                               </span>
                             );
                           return (
-                            <p className="text-sm sm:text-base md:text-lg font-extrabold text-indigo-600 dark:text-indigo-400 mb-2 sm:mb-3 md:mb-4">
+                            <p className="text-lg sm:text-xl md:text-2xl font-extrabold text-indigo-600 dark:text-indigo-400 mb-2 sm:mb-3 md:mb-4">
                               от {price.toLocaleString('ru-RU')} ₽{' '}
                               <span className="text-xs sm:text-sm md:text-sm font-medium text-gray-500 dark:text-gray-400">
                                 {dest.priceNote}
@@ -498,11 +500,11 @@ export default async function Home() {
         {/* Mission & Values */}
         <section
           aria-label="Наша философия и ценности"
-          className="py-16 bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-gray-800 dark:to-gray-900"
+          className="py-10 sm:py-12 lg:py-16 bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-gray-800 dark:to-gray-900"
         >
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-12">
-              <h2 className="text-3xl md:text-4xl font-extrabold mb-4">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold mb-3 sm:mb-4">
                 <span className="text-gradient-animated drop-shadow-md">Наша философия</span>
               </h2>
               <p className="text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto text-balance">
@@ -589,10 +591,10 @@ export default async function Home() {
         </section>
 
         {/* Team Section */}
-        <section aria-label="Наша команда" className="py-16 bg-white dark:bg-gray-900">
+        <section aria-label="Наша команда" className="py-10 sm:py-12 lg:py-16 bg-white dark:bg-gray-900">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-12">
-              <h2 className="text-3xl md:text-4xl font-extrabold mb-4">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold mb-3 sm:mb-4">
                 <span className="text-gradient-animated drop-shadow-md">Наша команда</span>
               </h2>
               <p className="text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto text-balance">

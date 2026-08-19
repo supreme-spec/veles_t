@@ -1535,7 +1535,9 @@ span[style*='filter: none'] {
   width: 42px; /* Оптимизировано для мобильных */
   height: 20px;
   perspective: 500px;
-  margin-left: 8px;
+  margin-left: 12px;
+  padding-left: 12px;
+  border-left: 1px solid rgb(100 116 139 / 0.35);
   display: flex;
   align-items: center;
   justify-content: center;
