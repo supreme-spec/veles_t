@@ -21,11 +21,11 @@ export class HotelDumpWorker {
 
     parser.on('data', async (hotel: any) => {
       const mappedHotel = {
-        ostrovokHid: hotel.id,
+        ostrovokHid: hotel.hid,
         ostrovokId: String(hotel.id),
         name: hotel.name || '',
         normalizedName: String(hotel.name || '').toLowerCase().trim(),
-        slug: this.slugify(`${hotel.name}-${hotel.id}`),
+        slug: this.slugify(`${hotel.name}-${hotel.hid}`),
         country: hotel.country || null,
         region: hotel.region || null,
         city: hotel.city || null,

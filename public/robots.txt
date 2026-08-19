@@ -63,6 +63,9 @@ User-agent: anthropic-ai
 Allow: /
 
 # xAI (Grok)
+User-agent: Grokbot
+Allow: /
+
 User-agent: Grok
 Allow: /
 
@@ -95,6 +98,7 @@ Allow: /
 Disallow: /api/
 Disallow: /_next/
 Disallow: /admin/
+Clean-param: utm_source&utm_medium&utm_campaign&utm_content&utm_term /
 
 User-agent: Googlebot
 Allow: /

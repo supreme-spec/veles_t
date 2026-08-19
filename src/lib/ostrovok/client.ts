@@ -4,6 +4,18 @@ dotenv.config({ path: '.env.local' });
 
 const OSTROVOK_BASE_URL = 'https://api.ostrovok.ru/api';
 
+const toSnakeCase = (obj: any): any => {
+  if (Array.isArray(obj)) return obj.map(toSnakeCase);
+  if (obj !== null && typeof obj === 'object' && !(obj instanceof Date)) {
+    return Object.keys(obj).reduce((acc, key) => {
+      const snakeKey = key.replace(/([A-Z])/g, '_$1').toLowerCase();
+      acc[snakeKey] = toSnakeCase(obj[key]);
+      return acc;
+    }, {} as any);
+  }
+  return obj;
+};
+
 export interface OstrovokConfig {
   apiKey: string;
   dKey: string;
@@ -34,6 +46,13 @@ export class OstrovokClient {
         'User-Agent': 'VelesVoyage/1.0 (+https://veles-voyage.ru)',
         'Authorization': `Basic ${Buffer.from(`${this.config.dKey}:${this.config.apiKey}`).toString('base64')}`,
       },
+    });
+
+    this.client.interceptors.request.use((config) => {
+      if (config.data) {
+        config.data = toSnakeCase(config.data);
+      }
+      return config;
     });
   }
 

@@ -4,6 +4,8 @@ import { checkRateLimit, getUserKey } from '@/lib/rate-limiter';
 
 export const runtime = 'nodejs';
 
+const RETRYABLE_ERRORS = ['timeout', 'unknown', 'duplicate_reservation', 'double_booking_form'];
+
 export async function POST(req: Request) {
   const userKey = getUserKey(req);
   if (!(await checkRateLimit(`booking:create:${userKey}`, 5, 60_000))) {
@@ -43,7 +45,9 @@ export async function POST(req: Request) {
 
         lastError = result;
 
-        if (!['timeout', 'unknown'].includes(result.status) && !result.error?.includes('duplicate_reservation')) {
+        const isRetryable = result.status === 'error' && RETRYABLE_ERRORS.some(e => result.error?.includes(e));
+
+        if (!isRetryable) {
           return NextResponse.json({ error: result.error || 'Create booking failed', status: result.status, attempt }, { status: 400 });
         }
       } catch (error: any) {
