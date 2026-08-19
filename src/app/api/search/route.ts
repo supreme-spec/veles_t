@@ -112,6 +112,7 @@ export async function GET(req: Request) {
           taxesIncluded: hotels.taxesIncluded,
           mealType: hotels.mealType,
           freeCancellationBefore: hotels.freeCancellationBefore,
+          geo: hotels.geo,
         })
         .from(hotels)
         .where(eq(hotels.status, 'ACTIVE'))
@@ -206,6 +207,7 @@ export async function GET(req: Request) {
         taxesIncluded: hotels.taxesIncluded,
         mealType: hotels.mealType,
         freeCancellationBefore: hotels.freeCancellationBefore,
+        geo: hotels.geo,
       })
       .from(hotels)
       .where(sql`${hotels.name} ILIKE ${`%${query}%`} OR ${hotels.city} ILIKE ${`%${query}%`} OR ${hotels.country} ILIKE ${`%${query}%`}`)

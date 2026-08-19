@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { SearchFilters, type Filters } from '@/components/hotels/SearchFilters';
+import { HotelMap, type HotelMapPoint } from '@/components/hotels/HotelMap';
 import { formatPrice, getMealTypeLabel, formatCancellationDate } from '@/lib/price-helpers';
 
 interface Suggestion {
@@ -71,6 +72,7 @@ export function HotelSearch() {
     amenities: [],
     freeCancellation: false,
   });
+  const [view, setView] = useState<'list' | 'map'>('list');
 
   const inputRef = useRef<HTMLInputElement>(null);
   const suggestionsRef = useRef<HTMLDivElement>(null);
@@ -386,8 +388,59 @@ export function HotelSearch() {
         </div>
       )}
 
+      {searched && results.length > 0 && filteredResults.length === 0 && !loading && !error && (
+        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-12 text-center">
+          <p className="text-slate-500 text-lg">По выбранным фильтрам ничего не найдено. Попробуйте изменить параметры.</p>
+        </div>
+      )}
+
       {results.length > 0 && (
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        <>
+          <div className="flex items-center justify-between max-w-7xl mx-auto mb-4">
+            <p className="text-sm text-slate-500">Найдено: {filteredResults.length}</p>
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={() => setView('list')}
+                className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${
+                  view === 'list' ? 'bg-blue-900 text-white' : 'bg-white border border-slate-200 text-slate-700'
+                }`}
+              >
+                Список
+              </button>
+              <button
+                type="button"
+                onClick={() => setView('map')}
+                className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${
+                  view === 'map' ? 'bg-blue-900 text-white' : 'bg-white border border-slate-200 text-slate-700'
+                }`}
+              >
+                Карта
+              </button>
+            </div>
+          </div>
+
+          {view === 'map' ? (
+            <HotelMap
+              hotels={filteredResults
+                .map((hotel) => {
+                  const geo = (hotel as any).geo as [number, number] | undefined;
+                  if (!geo) return null;
+                  return {
+                    id: hotel.id,
+                    name: hotel.name,
+                    city: hotel.city,
+                    country: hotel.country,
+                    stars: hotel.stars,
+                    minPrice: hotel.minPrice,
+                    lng: geo[0],
+                    lat: geo[1],
+                  } satisfies HotelMapPoint;
+                })
+                .filter(Boolean) as HotelMapPoint[]}
+            />
+          ) : (
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           <aside className="lg:col-span-1">
             <div className="bg-white dark:bg-gray-800 rounded-2xl border border-slate-100 shadow-sm p-5">
               <h3 className="text-sm font-semibold text-slate-900 mb-3">Фильтры</h3>
