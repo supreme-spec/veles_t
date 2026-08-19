@@ -36,8 +36,9 @@ async function upsertHotel(h: any) {
       city: h.city?.name || 'Неизвестно',
       district: h.district?.name || null,
       address: h.address || null,
-      latitude: Number(h.latitude || 0),
-      longitude: Number(h.longitude || 0),
+      geo: h.latitude != null && h.longitude != null
+        ? [Number(h.longitude), Number(h.latitude)] as [number, number]
+        : null,
       stars: Number(h.stars || 0),
       propertyType: h.kind || 'Hotel',
       description: (h.description_struct?.[0]?.paragraphs || []).join('\n') || null,

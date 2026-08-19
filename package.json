@@ -33,7 +33,8 @@
     "update:cities": "npx tsx scripts/update-cities.ts",
     "update:airports": "npx tsx scripts/update-airports.ts",
     "update:data": "npm run update:cities && npm run update:airports",
-    "sync:hotels": "tsx src/workers/sync-hotels.ts"
+    "sync:hotels": "tsx src/workers/sync-hotels.ts",
+    "cancel:test-bookings": "tsx src/scripts/cancel-test-bookings.ts"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1111.0",
