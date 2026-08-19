@@ -111,7 +111,7 @@ export default async function Home() {
                 <div className="order-1 lg:order-1 flex flex-col gap-3 sm:gap-4 md:gap-5 justify-center lg:justify-start w-full">
                   <Link
                     href="/wiki"
-                    className="group relative inline-flex items-center justify-center bg-gradient-to-r from-green-600 via-emerald-500 to-green-600 hover:from-green-700 hover:via-emerald-600 hover:to-green-700 text-white font-bold py-3 sm:py-3.5 md:py-4 lg:py-5 px-4 sm:px-5 md:px-6 lg:px-10 rounded-xl sm:rounded-xl md:rounded-2xl text-sm sm:text-sm md:text-base lg:text-lg transition-all duration-300 shadow-2xl hover:shadow-green-500/50 transform hover:scale-105 hover:-translate-y-1 overflow-hidden active:scale-95 w-full sm:w-auto"
+                    className="group relative inline-flex items-center justify-center bg-white/10 backdrop-blur-md hover:bg-white/20 text-white font-semibold py-3 sm:py-3.5 md:py-4 lg:py-5 px-4 sm:px-5 md:px-6 lg:px-10 rounded-xl sm:rounded-xl md:rounded-2xl text-sm sm:text-sm md:text-base lg:text-lg transition-all duration-300 border border-white/50 hover:border-white shadow-xl hover:shadow-white/20 transform hover:scale-[1.03] hover:-translate-y-0.5 overflow-hidden active:scale-95 w-full sm:w-auto"
                   >
                     <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-1000"></span>
                     <span className="relative z-10 flex items-center gap-2">
@@ -121,9 +121,9 @@ export default async function Home() {
                   </Link>
                   <Link
                     href="/wiki/countries"
-                    className="group relative inline-flex items-center justify-center bg-white/15 backdrop-blur-md hover:bg-white/25 text-white font-bold py-3 sm:py-3.5 md:py-4 lg:py-5 px-4 sm:px-5 md:px-6 lg:px-10 rounded-xl sm:rounded-xl md:rounded-2xl text-sm sm:text-sm md:text-base lg:text-lg transition-all duration-300 border-2 border-white/60 hover:border-white shadow-2xl hover:shadow-white/30 transform hover:scale-105 hover:-translate-y-1 overflow-hidden active:scale-95 w-full sm:w-auto"
+                    className="group relative inline-flex items-center justify-center bg-white/10 backdrop-blur-md hover:bg-white/20 text-white font-semibold py-3 sm:py-3.5 md:py-4 lg:py-5 px-4 sm:px-5 md:px-6 lg:px-10 rounded-xl sm:rounded-xl md:rounded-2xl text-sm sm:text-sm md:text-base lg:text-lg transition-all duration-300 border border-white/50 hover:border-white shadow-xl hover:shadow-white/20 transform hover:scale-[1.03] hover:-translate-y-0.5 overflow-hidden active:scale-95 w-full sm:w-auto"
                   >
-                    <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-1000"></span>
+                    <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-1000"></span>
                     <span className="relative z-10 flex items-center gap-2">
                       <span className="text-xl sm:text-2xl">🌍</span>
                       <span>Страны мира</span>
@@ -131,7 +131,7 @@ export default async function Home() {
                   </Link>
                   <Link
                     href="/wiki/places"
-                    className="group relative inline-flex items-center justify-center bg-gradient-to-r from-purple-600 via-pink-500 to-purple-600 hover:from-purple-700 hover:via-pink-600 hover:to-purple-700 text-white font-bold py-3 sm:py-3.5 md:py-4 lg:py-5 px-4 sm:px-5 md:px-6 lg:px-10 rounded-xl sm:rounded-xl md:rounded-2xl text-sm sm:text-sm md:text-base lg:text-lg transition-all duration-300 shadow-2xl hover:shadow-pink-500/50 transform hover:scale-105 hover:-translate-y-1 overflow-hidden active:scale-95 w-full sm:w-auto"
+                    className="group relative inline-flex items-center justify-center bg-white/10 backdrop-blur-md hover:bg-white/20 text-white font-semibold py-3 sm:py-3.5 md:py-4 lg:py-5 px-4 sm:px-5 md:px-6 lg:px-10 rounded-xl sm:rounded-xl md:rounded-2xl text-sm sm:text-sm md:text-base lg:text-lg transition-all duration-300 border border-white/50 hover:border-white shadow-xl hover:shadow-white/20 transform hover:scale-[1.03] hover:-translate-y-0.5 overflow-hidden active:scale-95 w-full sm:w-auto"
                   >
                     <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-1000"></span>
                     <span className="relative z-10 flex items-center gap-2">
@@ -231,7 +231,7 @@ export default async function Home() {
                         href="https://t.me/Anastasiiiiyyaa"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="group relative block w-full text-center bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-700 hover:via-indigo-700 hover:to-purple-700 text-white font-bold py-2.5 sm:py-2.5 md:py-2.5 lg:py-3 px-3 sm:px-4 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg hover:shadow-blue-500/30 transform hover:scale-105 text-xs sm:text-xs md:text-sm lg:text-sm overflow-hidden active:scale-95"
+                        className="group relative block w-full text-center bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 sm:py-2.5 md:py-2.5 lg:py-3 px-3 sm:px-4 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg hover:shadow-indigo-500/30 transform hover:scale-105 text-xs sm:text-xs md:text-sm lg:text-sm overflow-hidden active:scale-95"
                       >
                         <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-1000"></span>
                         <span className="relative z-10">Получить подборку путешествий</span>
@@ -680,7 +680,7 @@ export default async function Home() {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8">
-              <div className="bg-white dark:bg-gray-700 p-4 sm:p-5 md:p-6 rounded-xl shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 border-t-4 border-blue-500">
+              <div className="bg-white dark:bg-gray-700 p-4 sm:p-5 md:p-6 rounded-xl shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 border-t-4 border-indigo-500">
                 <div className="text-3xl sm:text-4xl mb-3 sm:mb-4 text-blue-600">🗺️</div>
                 <h3 className="text-base sm:text-lg md:text-xl font-semibold text-gray-900 dark:text-white mb-2 sm:mb-3">
                   Полная энциклопедия
@@ -691,7 +691,7 @@ export default async function Home() {
                 </p>
               </div>
 
-              <div className="bg-white dark:bg-gray-700 p-4 sm:p-5 md:p-6 rounded-xl shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 border-t-4 border-green-500">
+              <div className="bg-white dark:bg-gray-700 p-4 sm:p-5 md:p-6 rounded-xl shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 border-t-4 border-indigo-500">
                 <div className="text-3xl sm:text-4xl mb-3 sm:mb-4 text-green-600">📱</div>
                 <h3 className="text-base sm:text-lg md:text-xl font-semibold text-gray-900 dark:text-white mb-2 sm:mb-3">
                   Цифровые решения
@@ -701,7 +701,7 @@ export default async function Home() {
                 </p>
               </div>
 
-              <div className="bg-white dark:bg-gray-700 p-4 sm:p-5 md:p-6 rounded-xl shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 border-t-4 border-purple-500">
+              <div className="bg-white dark:bg-gray-700 p-4 sm:p-5 md:p-6 rounded-xl shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 border-t-4 border-indigo-500">
                 <div className="text-3xl sm:text-4xl mb-3 sm:mb-4 text-purple-600">🌟</div>
                 <h3 className="text-base sm:text-lg md:text-xl font-semibold text-gray-900 dark:text-white mb-2 sm:mb-3">
                   Персональный опыт
@@ -712,7 +712,7 @@ export default async function Home() {
                 </p>
               </div>
 
-              <div className="bg-white dark:bg-gray-700 p-4 sm:p-5 md:p-6 rounded-xl shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 border-t-4 border-yellow-500">
+              <div className="bg-white dark:bg-gray-700 p-4 sm:p-5 md:p-6 rounded-xl shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 border-t-4 border-indigo-500">
                 <div className="text-3xl sm:text-4xl mb-3 sm:mb-4 text-yellow-600">💰</div>
                 <h3 className="text-base sm:text-lg md:text-xl font-semibold text-gray-900 dark:text-white mb-2 sm:mb-3">
                   Прозрачные условия
@@ -723,7 +723,7 @@ export default async function Home() {
                 </p>
               </div>
 
-              <div className="bg-white dark:bg-gray-700 p-4 sm:p-5 md:p-6 rounded-xl shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 border-t-4 border-red-500">
+              <div className="bg-white dark:bg-gray-700 p-4 sm:p-5 md:p-6 rounded-xl shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 border-t-4 border-indigo-500">
                 <div className="text-3xl sm:text-4xl mb-3 sm:mb-4 text-red-600">🛡️</div>
                 <h3 className="text-base sm:text-lg md:text-xl font-semibold text-gray-900 dark:text-white mb-2 sm:mb-3">
                   Надежность и безопасность
