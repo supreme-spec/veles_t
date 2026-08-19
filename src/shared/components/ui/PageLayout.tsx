@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import Link from 'next/link';
 import { OptimizedImage } from '@/shared/components/ui/OptimizedImage';
 
 interface PageLayoutProps {
@@ -94,9 +95,9 @@ export function PageLayout({
           <div className="bg-gray-50 border-b border-gray-200">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
               <nav className="flex items-center space-x-2 text-sm text-gray-600">
-                <a href="/" className="hover:text-indigo-600 transition-colors">
+                <Link href="/" className="hover:text-indigo-600 transition-colors">
                   🏠 Главная
-                </a>
+                </Link>
                 <span>→</span>
                 <span className="text-gray-900 font-medium">{title}</span>
               </nav>
@@ -124,9 +125,9 @@ export function PageLayout({
               <h4 className="font-semibold mb-4">Разделы</h4>
               <ul className="space-y-2 text-gray-300">
                 <li>
-                  <a href="/wiki" className="hover:text-white transition-colors">
+                  <Link href="/wiki" className="hover:text-white transition-colors">
                     📖 Энциклопедия
-                  </a>
+                  </Link>
                 </li>
                 <li>
                   <a href="/privacy" className="hover:text-white transition-colors">

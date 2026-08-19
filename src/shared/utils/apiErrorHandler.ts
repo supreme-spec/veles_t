@@ -28,10 +28,10 @@ export function handleApiError(error: unknown, context = 'API'): NextResponse {
       {
         error: 'Validation Error',
         message: 'Invalid request data',
-        details: error.errors.map((err) => ({
-          path: err.path.join('.'),
+        details: (error as any).issues?.map((err: any) => ({
+          path: err.path?.join('.') || '',
           message: err.message,
-        })),
+        })) || [],
       },
       { status: 400 }
     );
