@@ -5,6 +5,8 @@ import { sql } from 'drizzle-orm';
 
 export const runtime = 'nodejs';
 
+const MAPTILER_API_KEY = process.env.MAPTILER_API_KEY || '';
+
 const POPULAR_CITIES = [
   { city: 'Москва', country: 'Россия', slug: 'moscow' },
   { city: 'Санкт-Петербург', country: 'Россия', slug: 'saint-petersburg' },
@@ -23,6 +25,34 @@ const POPULAR_CITIES = [
   { city: 'Рим', country: 'Италия', slug: 'rome' },
   { city: 'Барселона', country: 'Испания', slug: 'barcelona' },
 ];
+
+async function getMapTilerSuggestions(query: string, limit: number) {
+  if (!MAPTILER_API_KEY || query.length < 2) return [];
+  try {
+    const url = `https://api.maptiler.com/geocoding/${encodeURIComponent(query)}.json?key=${MAPTILER_API_KEY}&language=ru&limit=${limit}`;
+    const response = await fetch(url, { next: { revalidate: 3600 } });
+    if (!response.ok) return [];
+    const data = await response.json();
+    return (data.features || [])
+      .filter((f: any) => f.place_type && f.place_type.includes('place') || f.place_type.includes('locality'))
+      .map((f: any) => {
+        const country = f.context?.find((c: any) => c.id.startsWith('country'))?.text || '';
+        const city = f.text || '';
+        return {
+          text: country ? `${city}, ${country}` : city,
+          city,
+          country,
+          lat: f.center?.[1],
+          lon: f.center?.[0],
+          type: 'city' as const,
+          source: 'maptiler' as const,
+        };
+      });
+  } catch (error) {
+    console.error('[SUGGESTIONS MAPTILER ERROR]:', error);
+    return [];
+  }
+}
 
 export async function GET(request: Request) {
   try {
@@ -108,10 +138,13 @@ export async function GET(request: Request) {
       console.error('[SUGGESTIONS HOTELS ERROR]:', e);
     }
 
+    const maptilerSuggestions = await getMapTilerSuggestions(query, limit);
+
     const combined = [
       ...matchedPopular,
       ...dbSuggestions.filter((d) => !matchedPopular.some((p) => p.city === d.city)),
       ...hotelSuggestions,
+      ...maptilerSuggestions.filter((m) => !matchedPopular.some((p) => p.city === m.city) && !dbSuggestions.some((d) => d.city === m.city)),
     ].slice(0, limit);
 
     return NextResponse.json({
