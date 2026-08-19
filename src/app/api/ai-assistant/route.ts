@@ -1,116 +1,26 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { safeLogger } from '@/shared/utils/safeLogger';
+import { NextResponse } from 'next/server';
 
-const GROQ_API_KEY = process.env.GROQ_API_KEY || '';
-const GROQ_MODEL = process.env.NEXT_PUBLIC_GROQ_MODEL || 'llama-3.3-70b-versatile';
+export const runtime = 'nodejs';
 
-const SYSTEM_PROMPT = `Ты - AI-ассистент туристической компании "Велес Вояж" (https://veles-voyage.ru/ ).
-Твоя основная задача - помочь пользователю с первичной квалификацией запроса на путешествие и предоставить общую информацию.
-
-ВАЖНО: Мы общаемся исключительно в рамках путешествий и туризма.
-ЗАПРЕЩЕННЫЕ темы: войны, наркотики, политика, религия, преступления, сексуальные услуги.
-
-🌟 **Велес Вояж - ваш надежный партнер в мире путешествий!**
-Мы предлагаем лучшие предложения и цены на рынке.
-
-Контактная информация для связи с менеджером:
-- 📱 Телефон: +7 985 063-51-34
-- 💬 Telegram: @Anastasiiiiyyaa (персональный менеджер) или @veles_voyage (официальный канал)
-
-Твои функции:
-1.  **Первичная квалификация запроса:**
-    *   Спроси пользователя о желаемом направлении, датах поездки (гибкость), количестве путешественников (взрослые/дети), предпочтительном бюджете, типе отдыха.
-    *   Постарайся собрать как можно больше деталей, чтобы менеджер мог предложить наиболее подходящие варианты.
-2.  **Предоставление общей информации:**
-    *   Отвечай на вопросы о странах, визах, достопримечательностям, климате, валюте и культуре, но только если у тебя есть точная и проверенная информация.
-    *   **Если информация может быть устаревшей или требует уточнения (например, актуальные визовые правила, точные цены):** Прямо сообщи об этом и предложи связаться с менеджером для получения самой свежей информации.
-3.  **Передача запроса менеджеру:**
-    *   Если пользователь выражает явное желание забронировать тур, получить индивидуальную подборку, или если ты не можешь дать точный ответ, предложи связаться с менеджером.
-    *   Предоставь контакты менеджера (телефон и Telegram) и объясни, что менеджер сможет помочь с детальной подборкой и бронированием.
-    *   В случае ошибки или невозможности обработать запрос, НЕ выдавай техническую ошибку. Вместо этого, вежливо предложи связаться с менеджером.
-
-Стиль ответов:
-- Используй жирный текст для заголовков и важной информации
-- Структурируй информацию в виде таблиц, списков и разделов
-- Добавляй эмодзи для лучшей визуализации
-- Используй markdown форматирование (жирный, курсив)
-- Разделяй информацию на логические блоки с заголовками
-- Делай ответы информативными, но не перегруженными
-
-Отвечай на русском языке, будь дружелюбным и профессиональным.
-Если не знаешь точного ответа, честно скажи об этом и предложи связаться с менеджером для получения точной информации.
-
-КРИТИЧЕСКОЕ ПРАВИЛО: Если в ответе упоминается конкретная страна, город или регион, ты ОБЯЗАН добавить прямую ссылку на соответствующую страницу вики на нашем сайте в формате:
-[Название страны](https://veles-voyage.ru/wiki/{slug})
-
-Используй только латинские slug (например: turkey, egypt, uae, thailand, maldives, greece, srilanka, vietnam). Никогда не используй кириллицу в URL.`;
-
-export async function POST(request: NextRequest) {
+export async function POST(req: Request) {
   try {
-    const { message } = await request.json();
+    const { message } = await req.json();
 
     if (!message || typeof message !== 'string') {
-      return NextResponse.json({ error: 'Invalid message' }, { status: 400 });
-    }
-
-    if (!GROQ_API_KEY) {
-      safeLogger.error('Groq API key is not configured');
       return NextResponse.json(
-        {
-          reply:
-            'К сожалению, возникла техническая ошибка. Пожалуйста, свяжитесь с нашим менеджером по телефону +7 985 063-51-34 или в Telegram (@Anastasiiiiyyaa или @veles_voyage) для получения помощи.',
-        },
-        { status: 200 }
+        { reply: 'Пожалуйста, отправьте текст запроса.' },
+        { status: 400 }
       );
     }
 
-    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${GROQ_API_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: GROQ_MODEL,
-        messages: [
-          {
-            role: 'system',
-            content: SYSTEM_PROMPT,
-          },
-          {
-            role: 'user',
-            content: message,
-          },
-        ],
-        temperature: 0.7,
-        max_tokens: 500,
-      }),
-    });
+    const reply = `Спасибо за ваш вопрос! AI-ассистент временно недоступен. Для помощи свяжитесь с нашим менеджером по телефону +7 985 063-51-34 или в Telegram @Anastasiiiiyyaa.`;
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      safeLogger.error('Groq API error', { status: response.status, body: errorText });
-      return NextResponse.json(
-        {
-          reply:
-            'К сожалению, возникла техническая ошибка. Пожалуйста, свяжитесь с нашим менеджером по телефону +7 985 063-51-34 или в Telegram (@Anastasiiiiyyaa или @veles_voyage) для получения помощи.',
-        },
-        { status: 200 }
-      );
-    }
-
-    const data = await response.json();
-    const reply = data.choices?.[0]?.message?.content || 'Извините, не удалось получить ответ.';
-
-    return NextResponse.json({ reply }, { status: 200 });
+    return NextResponse.json({ reply });
   } catch (error) {
-    safeLogger.error('AI assistant error:', error);
+    console.error('[AI ASSISTANT ERROR]', error);
     return NextResponse.json(
-      {
-        reply:
-          'К сожалению, произошла ошибка при получении ответа. Пожалуйста, свяжитесь с нашим менеджером по телефону +7 985 063-51-34 или в Telegram (@Anastasiiiiyyaa или @veles_voyage) для получения помощи.',
-      },
-      { status: 200 }
+      { reply: 'Произошла ошибка. Попробуйте позже или свяжитесь с нашим менеджером.' },
+      { status: 500 }
     );
   }
 }

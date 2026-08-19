@@ -18,19 +18,24 @@ interface HotelPageProps {
 }
 
 export async function generateStaticParams() {
-  const activeHotels = await db
-    .select()
-    .from(hotels)
-    .where(eq(hotels.status, 'ACTIVE'))
-    .limit(100);
+  try {
+    const activeHotels = await db
+      .select()
+      .from(hotels)
+      .where(eq(hotels.status, 'ACTIVE'))
+      .limit(100);
 
-  return activeHotels
-    .filter((h) => h.seoSlug && h.city && h.country)
-    .map((h) => ({
-      country: slugify(h.country!),
-      city: slugify(h.city!),
-      hotel: h.seoSlug,
-    }));
+    return activeHotels
+      .filter((h) => h.seoSlug && h.city && h.country)
+      .map((h) => ({
+        country: slugify(h.country!),
+        city: slugify(h.city!),
+        hotel: h.seoSlug,
+      }));
+  } catch (error) {
+    console.warn('[generateStaticParams] Database unavailable, returning empty params:', error);
+    return [];
+  }
 }
 
 export async function generateMetadata({ params }: HotelPageProps): Promise<Metadata> {
