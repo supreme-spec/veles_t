@@ -48,6 +48,10 @@ export async function GET(req: Request) {
         description: hotels.description,
         cancellationPolicies: hotels.cancellationPolicies,
         roomsData: hotels.roomsData,
+        minPrice: hotels.minPrice,
+        taxesIncluded: hotels.taxesIncluded,
+        mealType: hotels.mealType,
+        freeCancellationBefore: hotels.freeCancellationBefore,
       })
       .from(hotels)
       .where(and(...conditions))

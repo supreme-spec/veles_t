@@ -47,6 +47,10 @@ async function upsertHotel(h: any) {
       images: Array.isArray(h.images) ? h.images : [],
       cancellationPolicies: h.metapolicy_struct?.cancellation_penalties || null,
       roomsData: h.metapolicy_struct?.meal ? { mealTypes: h.metapolicy_struct.meal, taxes: h.metapolicy_struct.tax_data?.taxes || [] } : null,
+      minPrice: h.min_price != null ? Number(h.min_price) : null,
+      taxesIncluded: Boolean(h.taxes_included || h.included_by_supplier),
+      mealType: h.meal_types?.[0] || h.metapolicy_struct?.meal?.[0] || null,
+      freeCancellationBefore: h.free_cancellation_before ? new Date(h.free_cancellation_before) : null,
       status: 'ACTIVE' as const,
       source: 'ostrovok',
       lastSyncedAt: new Date(),
@@ -105,6 +109,12 @@ export async function GET(req: Request) {
           images: hotels.images,
           amenities: hotels.amenities,
           description: hotels.description,
+          cancellationPolicies: hotels.cancellationPolicies,
+          roomsData: hotels.roomsData,
+          minPrice: hotels.minPrice,
+          taxesIncluded: hotels.taxesIncluded,
+          mealType: hotels.mealType,
+          freeCancellationBefore: hotels.freeCancellationBefore,
         })
         .from(hotels)
         .where(eq(hotels.status, 'ACTIVE'))
@@ -193,6 +203,12 @@ export async function GET(req: Request) {
         images: hotels.images,
         amenities: hotels.amenities,
         description: hotels.description,
+        cancellationPolicies: hotels.cancellationPolicies,
+        roomsData: hotels.roomsData,
+        minPrice: hotels.minPrice,
+        taxesIncluded: hotels.taxesIncluded,
+        mealType: hotels.mealType,
+        freeCancellationBefore: hotels.freeCancellationBefore,
       })
       .from(hotels)
       .where(sql`${hotels.name} ILIKE ${`%${query}%`} OR ${hotels.city} ILIKE ${`%${query}%`} OR ${hotels.country} ILIKE ${`%${query}%`}`)

@@ -2,6 +2,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import type { Hotel } from '@/db/schema';
 import { slugify } from '@/lib/slugify';
+import { formatPrice, getMealTypeLabel, formatCancellationDate } from '@/lib/price-helpers';
 
 interface HotelCardProps {
   hotel: Hotel & {
@@ -46,6 +47,32 @@ export function HotelCard({ hotel }: HotelCardProps) {
           <p className="text-sm text-gray-600 mb-2">
             {hotel.city}, {hotel.country}
           </p>
+          {(hotel.minPrice != null || hotel.freeCancellationBefore || hotel.mealType) && (
+            <div className="mt-3 space-y-1">
+              {hotel.minPrice != null && (
+                <div className="flex items-baseline gap-2">
+                  <span className="text-lg font-bold text-slate-900">
+                    {formatPrice(hotel.minPrice)}
+                  </span>
+                  {!hotel.taxesIncluded && (
+                    <span className="text-xs text-orange-600">+налоги</span>
+                  )}
+                </div>
+              )}
+              {hotel.mealType && (
+                <div className="flex items-center gap-1 text-sm text-slate-600">
+                  <span>🍽️</span>
+                  <span>{getMealTypeLabel(hotel.mealType)}</span>
+                </div>
+              )}
+              {hotel.freeCancellationBefore && (
+                <div className="flex items-center gap-1 text-sm text-green-600">
+                  <span>✓</span>
+                  <span>Бесплатная отмена до {formatCancellationDate(hotel.freeCancellationBefore)}</span>
+                </div>
+              )}
+            </div>
+          )}
           {hotel.avgRating && (
             <div className="flex items-center gap-2">
               <span className="text-sm font-semibold">{Number(hotel.avgRating).toFixed(1)}</span>
