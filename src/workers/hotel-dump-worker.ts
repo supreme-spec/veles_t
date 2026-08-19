@@ -3,7 +3,6 @@ import zlib from 'zlib';
 import JSONStream from 'JSONStream';
 import { db } from '@/db';
 import { hotelStatusEnum, hotels } from '@/db/schema';
-import { ostrovokClient } from '@/lib/ostrovok/client';
 
 const BATCH_SIZE = 100;
 
@@ -60,7 +59,7 @@ export class HotelDumpWorker {
       console.log('[DUMP WORKER] Потоковый импорт завершен.');
     });
 
-    parser.on('error', (err) => {
+    parser.on('error', (err: any) => {
       console.error('[DUMP WORKER] Ошибка чтения потока:', err);
     });
   }

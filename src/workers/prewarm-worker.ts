@@ -1,5 +1,5 @@
+
 import { searchCoalescer } from '@/lib/search/coalescer';
-import { checkRateLimit, getUserKey } from '@/lib/rate-limiter';
 
 export interface PrewarmRoute {
   regionId: number;
@@ -19,13 +19,13 @@ function addDays(date: Date, days: number) {
   return result;
 }
 
-function formatDate(date: Date) {
-  return date.toISOString().split('T')[0];
+function formatDate(date: Date): string {
+  return date.toISOString().split('T')[0] || '';
 }
 
 export async function prewarmPopularRoutes() {
   const today = new Date();
-  const checkins = [addDays(today, 7), addDays(today, 14), addDays(today, 30)].map(formatDate);
+  const checkins: string[] = [addDays(today, 7), addDays(today, 14), addDays(today, 30)].map(formatDate);
   const durations = [3, 5, 7, 14];
 
   const jobs: Array<{

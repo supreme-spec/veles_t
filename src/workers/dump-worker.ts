@@ -99,7 +99,7 @@ async function processIncrementalDump() {
 
         await db.update(hotels)
           .set(payload)
-          .where(eq(hotels.ostrovokHid, update.hid));
+          .where(eq(hotels.ostrovokHid, Number(update.hid)));
       } catch (err) {
         console.error(`[DUMP] Error processing update for hotel ${update.hid}:`, err);
       }
@@ -133,8 +133,7 @@ async function processRegionsDump() {
             region: region.name,
             city: region.name,
             address: region.address || null,
-            latitude: Number(region.latitude || 0),
-            longitude: Number(region.longitude || 0),
+             geo: region.latitude != null && region.longitude != null ? [Number(region.longitude), Number(region.latitude)] as [number, number] : null,
             stars: 0,
             description: region.description || null,
             amenities: [],

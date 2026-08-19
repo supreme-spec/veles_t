@@ -44,8 +44,6 @@ export async function syncHotelsToMeilisearch() {
       city: h.city || '',
       country: h.country || '',
       stars: h.stars || 0,
-      rating: h.rating || 0,
-      price: h.price || 0,
       amenities: h.amenities || [],
       status: h.status,
     }));

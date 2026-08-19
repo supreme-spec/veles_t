@@ -64,7 +64,7 @@ async function getSessionId(): Promise<string> {
 export const aleanProvider: TourProvider = {
   id: 'alean',
   name: 'Алеан',
-  isActive: true,
+  isActive: false,
 
   async getDictionaries(): Promise<DictionaryData> {
     if (dictCache && dictCache.expires > Date.now()) {
