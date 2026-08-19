@@ -26,7 +26,7 @@ export function HotelGallery({ images, hotelName }: HotelGalleryProps) {
     );
   }
 
-  const selectedImage = images[selectedIndex];
+  const selectedImage = images[selectedIndex]!;
 
   return (
     <div className="space-y-4">

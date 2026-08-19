@@ -86,7 +86,7 @@ export async function POST(req: Request) {
     let verified = false;
     if (bookingId) {
       const booking = await db.select().from(bookings).where(eq(bookings.id, bookingId)).limit(1);
-      if (booking.length > 0 && booking[0].status === 'CONFIRMED') {
+      if (booking.length > 0 && booking[0]?.status === 'CONFIRMED') {
         verified = true;
       }
     }

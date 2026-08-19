@@ -24,6 +24,6 @@ export async function checkRateLimit(key: string, limit: number, windowMs: numbe
 
 export function getUserKey(request: Request): string {
   const forwarded = request.headers.get('x-forwarded-for');
-  const ip = forwarded ? forwarded.split(',')[0].trim() : 'anonymous';
+  const ip = forwarded ? forwarded.split(',')[0]?.trim() || 'anonymous' : 'anonymous';
   return `ip:${ip}`;
 }

@@ -1,4 +1,4 @@
-import { getCached, setCached, invalidateCache } from '@/lib/redis';
+import { getCached, setCached } from '@/lib/redis';
 
 export interface CircuitBreakerOptions {
   failureThreshold: number;
@@ -29,7 +29,7 @@ export class CircuitBreaker {
       return result;
     } catch (error) {
       this.onFailure();
-      if (fallback && this.state === 'open') {
+      if (fallback && this.failures >= this.options.failureThreshold) {
         return fallback();
       }
       throw error;

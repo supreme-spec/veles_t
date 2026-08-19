@@ -133,6 +133,7 @@ export async function GET(req: Request) {
       const coords = CITY_COORDS[lowerQuery];
 
       try {
+        const guestBase = { adults };
         const searchResult = coords
           ? await ostrovokClient.searchByGeo({
               lat: coords.lat,
@@ -140,7 +141,7 @@ export async function GET(req: Request) {
               radius: 20,
               checkin,
               checkout,
-              guests: [{ adults, children: children.length > 0 ? children : undefined }],
+              guests: children.length > 0 ? [{ ...guestBase, children }] : [guestBase],
               residency,
             })
           : await ostrovokClient.searchByGeo({
@@ -149,7 +150,7 @@ export async function GET(req: Request) {
               radius: 50,
               checkin,
               checkout,
-              guests: [{ adults, children: children.length > 0 ? children : undefined }],
+              guests: children.length > 0 ? [{ ...guestBase, children }] : [guestBase],
               residency,
             });
 

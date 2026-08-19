@@ -159,6 +159,7 @@ export class OstrovokClient {
     checkout: string;
     guests: Array<{ adults: number; children?: number[] }>;
     residency?: string;
+    timeout?: number;
   }) {
     const response = await this.client.post('/b2b/v3/search/hp/', {
       ...params,

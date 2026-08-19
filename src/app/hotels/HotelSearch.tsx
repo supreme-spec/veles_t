@@ -35,35 +35,6 @@ function getDefaultCheckDates() {
 
 const defaultDates = getDefaultCheckDates();
 
-const CITY_SLUGS: Record<string, string> = {
-  'москва': 'moscow',
-  'санкт-петербург': 'saint-petersburg',
-  'сочи': 'sochi',
-  'казань': 'kazan',
-  'дубай': 'dubai',
-  'стамбул': 'istanbul',
-  'бангкок': 'bangkok',
-};
-
-const COUNTRY_SLUGS: Record<string, string> = {
-  'россия': 'russia',
-  'турция': 'turkey',
-  'оаэ': 'uae',
-  'таиланд': 'thailand',
-  'египет': 'egypt',
-  'испания': 'spain',
-  'италия': 'italy',
-  'греция': 'greece',
-};
-
-function slugify(text: string): string {
-  return text
-    .toLowerCase()
-    .replace(/[ё]/g, 'e')
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '') || text.toLowerCase();
-}
-
 const CITIES = [
   { name: 'Москва', country: 'Россия', slug: 'moscow', countrySlug: 'russia' },
   { name: 'Санкт-Петербург', country: 'Россия', slug: 'saint-petersburg', countrySlug: 'russia' },

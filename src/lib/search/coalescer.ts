@@ -53,7 +53,7 @@ class SearchCoalescer {
   private async callOstrovok(params: SearchParams): Promise<any> {
     if (params.hotelIds && params.hotelIds.length > 0) {
       return ostrovokClient.searchByHotelIds({
-        hotelIds: params.hotelIds,
+        hotelIds: params.hotelIds.map(String),
         checkin: params.checkin,
         checkout: params.checkout,
         guests: params.guests,
@@ -93,7 +93,7 @@ class SearchCoalescer {
 
     if (this.inFlight.has(key)) {
       const pending = this.inFlight.get(key)!;
-      return new Promise((resolve, reject) => {
+      return new Promise((_resolve, reject) => {
         pending.resolve({ data: pending.promise, cached: false, coalesced: true });
         pending.reject = reject;
       });

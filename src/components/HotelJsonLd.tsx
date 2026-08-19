@@ -1,4 +1,4 @@
-import { Hotel, Review } from '@/db/schema';
+import type { Hotel, Review } from '@/db/schema';
 
 interface HotelJsonLdProps {
   hotel: Hotel;

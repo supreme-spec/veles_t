@@ -21,8 +21,11 @@ export async function processHotelImages(imageUrls: string[], hotelSlug: string)
   const results: ProcessedImage[] = [];
 
   for (let i = 0; i < urls.length; i++) {
+    const url = urls[i];
+    if (!url) continue;
+
     try {
-      const response = await fetch(urls[i]);
+      const response = await fetch(url);
       if (!response.ok) continue;
       const buffer = Buffer.from(await response.arrayBuffer());
 
