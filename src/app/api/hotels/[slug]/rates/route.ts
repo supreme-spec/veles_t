@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
 import { ostrovokClient } from '@/lib/ostrovok/client';
-import { getCached, setCached } from '@/lib/redis';
 import { checkRateLimit, getUserKey } from '@/lib/rate-limiter';
 
 export const runtime = 'nodejs';
@@ -24,12 +23,6 @@ export async function POST(req: Request, { params }: { params: Promise<{ slug: s
       return NextResponse.json({ error: 'Invalid hid' }, { status: 400 });
     }
 
-    const cacheKey = `hotelpage:${slug}:${checkin}:${checkout}:${JSON.stringify(guests || [])}:${residency}`;
-    const cached = await getCached<any>(cacheKey);
-    if (cached) {
-      return NextResponse.json({ ...cached, cached: true });
-    }
-
     const result = await ostrovokClient.getHotelpage({
       hid: Number(slug),
       checkin,
@@ -46,7 +39,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ slug: s
       }, { status: 500 });
     }
 
-    const hotelData = result.result?.results?.[0] || null;
+    const hotelData = result.data?.hotels?.[0] || null;
     const payload = {
       success: true,
       hotel: hotelData,
@@ -54,7 +47,6 @@ export async function POST(req: Request, { params }: { params: Promise<{ slug: s
       cached: false,
     };
 
-    await setCached(cacheKey, payload, 300);
     return NextResponse.json(payload);
   } catch (error: any) {
     console.error('[HOTELPAGE RATES ERROR]:', error);
