@@ -18,6 +18,16 @@ const nextConfig = {
         permanent: true,
       },
       {
+        source: '/news-sitemap.xml',
+        destination: '/api/news-sitemap',
+        permanent: true,
+      },
+      {
+        source: '/public/sitemap.xml',
+        destination: 'https://veles-voyage.ru/sitemap.xml',
+        permanent: true,
+      },
+      {
         source: '/places/:path*',
         destination: '/wiki/places',
         permanent: true,
