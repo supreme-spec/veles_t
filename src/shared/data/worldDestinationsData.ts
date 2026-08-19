@@ -33,7 +33,7 @@ export const WORLD_DESTINATIONS_DATA: Record<string, any> = {
     description: 'Страна фараонов: пирамиды, Красное море и круглогодичное солнце.',
     estimatedCost: 90000,
     priceNote: 'на двоих за 7 ночей',
-    image: 'https://images.unsplash.com/photo-1539650116574-75c0c6d73f6e?w=600&h=400&fit=crop&auto=format',
+    image: 'https://images.unsplash.com/photo-1503177119275-0b6a2f1f04b9?w=600&h=400&fit=crop&auto=format',
     alt: 'Египет — пирамиды Гизы',
     capital: 'Каир',
     currency: 'EGP',
