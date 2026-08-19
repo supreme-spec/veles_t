@@ -31,32 +31,13 @@ export const CookieConsentBanner: React.FC<CookieConsentBannerProps> = ({
   if (!mounted || !isVisible) return null;
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 bg-gray-800 text-white p-4 shadow-lg animate-fade-in-up">
-      <div className="max-w-6xl mx-auto">
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-          <div className="flex-1">
-            <p className="text-sm md:text-base">
-              Мы используем файлы cookie и рекомендательные алгоритмы. Продолжая использовать наш сайт, вы даете согласие на обработку персональных данных и принимаете{' '}
-              <Link 
-                href="/privacy" 
-                className="text-blue-300 hover:text-blue-100 underline"
-                target="_blank"
-              >
-                политику обработки персональных данных
-              </Link>.
-            </p>
-          </div>
-          <div className="flex flex-col sm:flex-row gap-2">
-            <button
-              onClick={acceptCookies}
-              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-md text-sm font-medium transition-colors whitespace-nowrap"
-            >
-              Принять
-            </button>
-          </div>
-        </div>
-      </div>
-      
+    <div className="fixed z-50 bottom-4 left-4 right-4 sm:right-auto sm:bottom-6 sm:max-w-md bg-gray-800/95 backdrop-blur-md text-white p-4 pr-10 sm:p-5 sm:pr-12 rounded-2xl shadow-2xl border border-white/10 animate-fade-in-up">
+      <p className="text-sm md:text-base">
+        Мы используем файлы cookie и рекомендательные алгоритмы. Продолжая использовать наш сайт, вы даете согласие на обработку персональных данных и принимаете{' '}
+        <Link href="/privacy" className="text-blue-300 hover:text-blue-100 underline" target="_blank">политику обработки персональных данных</Link>.
+      </p>
+      <button onClick={acceptCookies} className="mt-3 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 rounded-md text-sm font-medium transition-colors">Принять</button>
+      <button onClick={acceptCookies} aria-label="Закрыть баннер cookie" className="absolute top-2 right-2 w-8 h-8 flex items-center justify-center rounded-lg text-gray-300 hover:text-white hover:bg-white/10 transition-colors">✕</button>
       <style jsx>{`
         @keyframes fade-in-up {
           from {

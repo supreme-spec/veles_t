@@ -280,7 +280,7 @@ export function Navbar() {
               {/* Phone Button */}
               <a
                 href="tel:+79850635134"
-                className="flex items-center space-x-1 sm:space-x-2 px-2 sm:px-3 py-2 rounded-lg bg-green-500 hover:bg-green-600 text-white transition-colors font-medium text-xs sm:text-sm whitespace-nowrap flex-shrink-0"
+                className="flex items-center space-x-1 sm:space-x-2 px-2 sm:px-3 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white transition-colors font-medium text-xs sm:text-sm whitespace-nowrap flex-shrink-0"
                 title="Позвонить"
                 aria-label="Позвонить"
               >

@@ -1270,19 +1270,19 @@ article > * + * {
 
 /* Градиентный текст с анимацией */
 .text-gradient-animated {
-  background: linear-gradient(
-    90deg,
-    #667eea 0%,
-    #764ba2 25%,
-    #f093fb 50%,
-    #4facfe 75%,
-    #00f2fe 100%
-  );
+  background: linear-gradient(90deg, #4f46e5 0%, #818cf8 100%);
   background-size: 200% auto;
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  animation: gradient 3s linear infinite;
+  animation: none;
+}
+.dark .text-gradient-animated {
+  background: linear-gradient(90deg, #a5b4fc 0%, #c7d2fe 100%);
+  background-size: 200% auto;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 /* Сохранение естественного цвета эмодзи */
@@ -1535,7 +1535,9 @@ span[style*='filter: none'] {
   width: 42px; /* Оптимизировано для мобильных */
   height: 20px;
   perspective: 500px;
-  margin-left: 8px;
+  margin-left: 12px;
+  padding-left: 12px;
+  border-left: 1px solid rgb(100 116 139 / 0.35);
   display: flex;
   align-items: center;
   justify-content: center;
