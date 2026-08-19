@@ -12,6 +12,7 @@ import { WeeklyHeroBackground } from '@/shared/components/ui/WeeklyHeroBackgroun
 import { WORLD_DESTINATIONS_DATA } from '@/shared/data/worldDestinationsData';
 import { SITE_URL } from '@/shared/constants/seo';
 import { DestinationImage } from '@/components/DestinationImage';
+import { BookOpen, Globe2, Map as MapIcon, Trophy, Users, Headphones, Smartphone, Sparkles, Wallet, ShieldCheck, Target, Check } from 'lucide-react';
 
 const HOME_FAQ = [
   {
@@ -114,30 +115,30 @@ export default async function Home() {
                     className="group relative inline-flex items-center justify-center bg-white/10 backdrop-blur-md hover:bg-white/20 text-white font-semibold py-3 sm:py-3.5 md:py-4 lg:py-5 px-4 sm:px-5 md:px-6 lg:px-10 rounded-xl sm:rounded-xl md:rounded-2xl text-sm sm:text-sm md:text-base lg:text-lg transition-all duration-300 border border-white/50 hover:border-white shadow-xl hover:shadow-white/20 transform hover:scale-[1.03] hover:-translate-y-0.5 overflow-hidden active:scale-95 w-full sm:w-auto"
                   >
                     <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-1000"></span>
-                    <span className="relative z-10 flex items-center gap-2">
-                      <span className="text-xl sm:text-2xl">📚</span>
-                      <span>Исследовать Wiki</span>
-                    </span>
+                      <span className="relative z-10 flex items-center gap-2">
+                        <BookOpen className="w-5 h-5" />
+                        <span>Исследовать Wiki</span>
+                      </span>
                   </Link>
                   <Link
                     href="/wiki/countries"
                     className="group relative inline-flex items-center justify-center bg-white/10 backdrop-blur-md hover:bg-white/20 text-white font-semibold py-3 sm:py-3.5 md:py-4 lg:py-5 px-4 sm:px-5 md:px-6 lg:px-10 rounded-xl sm:rounded-xl md:rounded-2xl text-sm sm:text-sm md:text-base lg:text-lg transition-all duration-300 border border-white/50 hover:border-white shadow-xl hover:shadow-white/20 transform hover:scale-[1.03] hover:-translate-y-0.5 overflow-hidden active:scale-95 w-full sm:w-auto"
                   >
                     <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-1000"></span>
-                    <span className="relative z-10 flex items-center gap-2">
-                      <span className="text-xl sm:text-2xl">🌍</span>
-                      <span>Страны мира</span>
-                    </span>
+                      <span className="relative z-10 flex items-center gap-2">
+                        <Globe2 className="w-5 h-5" />
+                        <span>Страны мира</span>
+                      </span>
                   </Link>
                   <Link
                     href="/wiki/places"
                     className="group relative inline-flex items-center justify-center bg-white/10 backdrop-blur-md hover:bg-white/20 text-white font-semibold py-3 sm:py-3.5 md:py-4 lg:py-5 px-4 sm:px-5 md:px-6 lg:px-10 rounded-xl sm:rounded-xl md:rounded-2xl text-sm sm:text-sm md:text-base lg:text-lg transition-all duration-300 border border-white/50 hover:border-white shadow-xl hover:shadow-white/20 transform hover:scale-[1.03] hover:-translate-y-0.5 overflow-hidden active:scale-95 w-full sm:w-auto"
                   >
                     <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-1000"></span>
-                    <span className="relative z-10 flex items-center gap-2">
-                      <span className="text-xl sm:text-2xl">🗺️</span>
-                      <span>Мировые локации</span>
-                    </span>
+                      <span className="relative z-10 flex items-center gap-2">
+                        <MapIcon className="w-5 h-5" />
+                        <span>Мировые локации</span>
+                      </span>
                   </Link>
                 </div>
 
@@ -264,8 +265,8 @@ export default async function Home() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
               <div className="group relative bg-white dark:bg-gray-800 p-3 sm:p-4 md:p-5 lg:p-6 rounded-xl sm:rounded-2xl shadow-modern hover-lift text-center overflow-hidden transition-modern">
                 <div className="absolute inset-0 bg-gradient-to-br from-blue-500/0 via-indigo-500/0 to-purple-500/0 group-hover:from-blue-500/5 group-hover:via-indigo-500/5 group-hover:to-purple-500/5 transition-modern"></div>
-                <div className="text-2xl sm:text-3xl md:text-4xl mb-2 sm:mb-3 md:mb-4 animate-float relative z-10">
-                  🏆
+                <div className="relative z-10 mx-auto mb-3 sm:mb-4 w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-indigo-500/10 dark:bg-indigo-400/10 text-indigo-600 dark:text-indigo-300 flex items-center justify-center">
+                  <Trophy className="w-6 h-6 sm:w-7 sm:h-7" />
                 </div>
                 <h3 className="text-sm sm:text-base md:text-lg lg:text-xl font-semibold text-gray-900 dark:text-white mb-1.5 sm:mb-2 relative z-10">
                   Поддержка на каждом этапе
@@ -278,11 +279,8 @@ export default async function Home() {
 
               <div className="group relative bg-white dark:bg-gray-800 p-3 sm:p-4 md:p-5 lg:p-6 rounded-xl sm:rounded-2xl shadow-modern hover-lift text-center overflow-hidden transition-modern">
                 <div className="absolute inset-0 bg-gradient-to-br from-blue-500/0 via-indigo-500/0 to-purple-500/0 group-hover:from-blue-500/5 group-hover:via-indigo-500/5 group-hover:to-purple-500/5 transition-modern"></div>
-                <div
-                  className="text-2xl sm:text-3xl md:text-4xl mb-2 sm:mb-3 md:mb-4 animate-float relative z-10"
-                  style={{ animationDelay: '0.2s' }}
-                >
-                  👥
+                <div className="relative z-10 mx-auto mb-3 sm:mb-4 w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-indigo-500/10 dark:bg-indigo-400/10 text-indigo-600 dark:text-indigo-300 flex items-center justify-center">
+                  <Users className="w-6 h-6 sm:w-7 sm:h-7" />
                 </div>
                 <h3 className="text-sm sm:text-base md:text-lg lg:text-xl font-semibold text-gray-900 dark:text-white mb-1.5 sm:mb-2 relative z-10">
                   Внимание к вашим пожеланиям
@@ -295,11 +293,8 @@ export default async function Home() {
 
               <div className="group relative bg-white dark:bg-gray-800 p-3 sm:p-4 md:p-5 lg:p-6 rounded-xl sm:rounded-2xl shadow-modern hover-lift text-center overflow-hidden transition-modern">
                 <div className="absolute inset-0 bg-gradient-to-br from-blue-500/0 via-indigo-500/0 to-purple-500/0 group-hover:from-blue-500/5 group-hover:via-indigo-500/5 group-hover:to-purple-500/5 transition-modern"></div>
-                <div
-                  className="text-2xl sm:text-3xl md:text-4xl mb-2 sm:mb-3 md:mb-4 animate-float relative z-10"
-                  style={{ animationDelay: '0.4s' }}
-                >
-                  🎧
+                <div className="relative z-10 mx-auto mb-3 sm:mb-4 w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-indigo-500/10 dark:bg-indigo-400/10 text-indigo-600 dark:text-indigo-300 flex items-center justify-center">
+                  <Headphones className="w-6 h-6 sm:w-7 sm:h-7" />
                 </div>
                 <h3 className="text-sm sm:text-base md:text-lg lg:text-xl font-semibold text-gray-900 dark:text-white mb-1.5 sm:mb-2 relative z-10">
                   Прозрачные условия
@@ -312,11 +307,8 @@ export default async function Home() {
 
               <div className="group relative bg-white dark:bg-gray-800 p-3 sm:p-4 md:p-5 lg:p-6 rounded-xl sm:rounded-2xl shadow-modern hover-lift text-center overflow-hidden transition-modern">
                 <div className="absolute inset-0 bg-gradient-to-br from-blue-500/0 via-indigo-500/0 to-purple-500/0 group-hover:from-blue-500/5 group-hover:via-indigo-500/5 group-hover:to-purple-500/5 transition-modern"></div>
-                <div
-                  className="text-2xl sm:text-3xl md:text-4xl mb-2 sm:mb-3 md:mb-4 animate-float relative z-10"
-                  style={{ animationDelay: '0.6s' }}
-                >
-                  🌍
+                <div className="relative z-10 mx-auto mb-3 sm:mb-4 w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-indigo-500/10 dark:bg-indigo-400/10 text-indigo-600 dark:text-indigo-300 flex items-center justify-center">
+                  <Globe2 className="w-6 h-6 sm:w-7 sm:h-7" />
                 </div>
                 <h3 className="text-sm sm:text-base md:text-lg lg:text-xl font-semibold text-gray-900 dark:text-white mb-1.5 sm:mb-2 relative z-10">
                   Помогаем сделать правильный выбор
@@ -521,7 +513,7 @@ export default async function Home() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
               <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8">
                 <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4 flex items-center">
-                  <span className="mr-2">🛡️</span> Велес — покровитель путешественников
+                  <ShieldCheck className="w-5 h-5 mr-2" /> Велес — покровитель путешественников
                 </h3>
                 <p className="text-gray-600 dark:text-gray-300 mb-4">
                   Имя нашего агентства не случайно. Велес — древнеславянский бог-покровитель
@@ -540,23 +532,23 @@ export default async function Home() {
               <div className="space-y-6">
                 <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
                   <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3 flex items-center">
-                    <span className="mr-2 text-green-500">✨</span> Наши ценности
+                    <Sparkles className="w-5 h-5 mr-2 text-indigo-500" /> Наши ценности
                   </h3>
                   <ul className="space-y-2 text-gray-600 dark:text-gray-300">
                     <li className="flex items-center">
-                      <span className="text-green-500 mr-2">✓</span>
+                      <Check className="w-4 h-4 mr-2 shrink-0 text-indigo-600 dark:text-indigo-400" />
                       Аутентичные и уникальные впечатления
                     </li>
                     <li className="flex items-center">
-                      <span className="text-green-500 mr-2">✓</span>
+                      <Check className="w-4 h-4 mr-2 shrink-0 text-indigo-600 dark:text-indigo-400" />
                       Устойчивый и ответственный туризм
                     </li>
                     <li className="flex items-center">
-                      <span className="text-green-500 mr-2">✓</span>
+                      <Check className="w-4 h-4 mr-2 shrink-0 text-indigo-600 dark:text-indigo-400" />
                       Современные технологии в путешествиях
                     </li>
                     <li className="flex items-center">
-                      <span className="text-green-500 mr-2">✓</span>
+                      <Check className="w-4 h-4 mr-2 shrink-0 text-indigo-600 dark:text-indigo-400" />
                       Персональный подход к каждому клиенту
                     </li>
                   </ul>
@@ -570,23 +562,23 @@ export default async function Home() {
 
                 <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
                   <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3 flex items-center">
-                    <span className="mr-2 text-blue-500">🎯</span> Наш подход
+                    <Target className="w-5 h-5 mr-2 text-indigo-500" /> Наш подход
                   </h3>
                   <ul className="space-y-2 text-gray-600 dark:text-gray-300">
                     <li className="flex items-center">
-                      <span className="text-blue-500 mr-2">•</span>
+                      <Check className="w-4 h-4 mr-2 shrink-0 text-indigo-600 dark:text-indigo-400" />
                       Индивидуальные маршруты под ваши интересы
                     </li>
                     <li className="flex items-center">
-                      <span className="text-blue-500 mr-2">•</span>
+                      <Check className="w-4 h-4 mr-2 shrink-0 text-indigo-600 dark:text-indigo-400" />
                       Экспертное знание направлений
                     </li>
                     <li className="flex items-center">
-                      <span className="text-blue-500 mr-2">•</span>
+                      <Check className="w-4 h-4 mr-2 shrink-0 text-indigo-600 dark:text-indigo-400" />
                       Полное сопровождение 24/7
                     </li>
                     <li className="flex items-center">
-                      <span className="text-blue-500 mr-2">•</span>
+                      <Check className="w-4 h-4 mr-2 shrink-0 text-indigo-600 dark:text-indigo-400" />
                       Безопасность и комфорт
                     </li>
                   </ul>
@@ -681,7 +673,9 @@ export default async function Home() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8">
               <div className="bg-white dark:bg-gray-700 p-4 sm:p-5 md:p-6 rounded-xl shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 border-t-4 border-indigo-500">
-                <div className="text-3xl sm:text-4xl mb-3 sm:mb-4 text-blue-600">🗺️</div>
+                <div className="relative z-10 mb-3 sm:mb-4 w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-indigo-500/10 dark:bg-indigo-400/10 text-indigo-600 dark:text-indigo-300 flex items-center justify-center">
+                  <MapIcon className="w-6 h-6 sm:w-7 sm:h-7" />
+                </div>
                 <h3 className="text-base sm:text-lg md:text-xl font-semibold text-gray-900 dark:text-white mb-2 sm:mb-3">
                   Полная энциклопедия
                 </h3>
@@ -692,7 +686,9 @@ export default async function Home() {
               </div>
 
               <div className="bg-white dark:bg-gray-700 p-4 sm:p-5 md:p-6 rounded-xl shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 border-t-4 border-indigo-500">
-                <div className="text-3xl sm:text-4xl mb-3 sm:mb-4 text-green-600">📱</div>
+                <div className="relative z-10 mb-3 sm:mb-4 w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-indigo-500/10 dark:bg-indigo-400/10 text-indigo-600 dark:text-indigo-300 flex items-center justify-center">
+                  <Smartphone className="w-6 h-6 sm:w-7 sm:h-7" />
+                </div>
                 <h3 className="text-base sm:text-lg md:text-xl font-semibold text-gray-900 dark:text-white mb-2 sm:mb-3">
                   Цифровые решения
                 </h3>
@@ -702,7 +698,9 @@ export default async function Home() {
               </div>
 
               <div className="bg-white dark:bg-gray-700 p-4 sm:p-5 md:p-6 rounded-xl shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 border-t-4 border-indigo-500">
-                <div className="text-3xl sm:text-4xl mb-3 sm:mb-4 text-purple-600">🌟</div>
+                <div className="relative z-10 mb-3 sm:mb-4 w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-indigo-500/10 dark:bg-indigo-400/10 text-indigo-600 dark:text-indigo-300 flex items-center justify-center">
+                  <Sparkles className="w-6 h-6 sm:w-7 sm:h-7" />
+                </div>
                 <h3 className="text-base sm:text-lg md:text-xl font-semibold text-gray-900 dark:text-white mb-2 sm:mb-3">
                   Персональный опыт
                 </h3>
@@ -713,7 +711,9 @@ export default async function Home() {
               </div>
 
               <div className="bg-white dark:bg-gray-700 p-4 sm:p-5 md:p-6 rounded-xl shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 border-t-4 border-indigo-500">
-                <div className="text-3xl sm:text-4xl mb-3 sm:mb-4 text-yellow-600">💰</div>
+                <div className="relative z-10 mb-3 sm:mb-4 w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-indigo-500/10 dark:bg-indigo-400/10 text-indigo-600 dark:text-indigo-300 flex items-center justify-center">
+                  <Wallet className="w-6 h-6 sm:w-7 sm:h-7" />
+                </div>
                 <h3 className="text-base sm:text-lg md:text-xl font-semibold text-gray-900 dark:text-white mb-2 sm:mb-3">
                   Прозрачные условия
                 </h3>
@@ -724,7 +724,9 @@ export default async function Home() {
               </div>
 
               <div className="bg-white dark:bg-gray-700 p-4 sm:p-5 md:p-6 rounded-xl shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 border-t-4 border-indigo-500">
-                <div className="text-3xl sm:text-4xl mb-3 sm:mb-4 text-red-600">🛡️</div>
+                <div className="relative z-10 mb-3 sm:mb-4 w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-indigo-500/10 dark:bg-indigo-400/10 text-indigo-600 dark:text-indigo-300 flex items-center justify-center">
+                  <ShieldCheck className="w-6 h-6 sm:w-7 sm:h-7" />
+                </div>
                 <h3 className="text-base sm:text-lg md:text-xl font-semibold text-gray-900 dark:text-white mb-2 sm:mb-3">
                   Надежность и безопасность
                 </h3>
@@ -735,7 +737,9 @@ export default async function Home() {
               </div>
 
               <div className="bg-white dark:bg-gray-700 p-4 sm:p-5 md:p-6 rounded-xl shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 border-t-4 border-indigo-500">
-                <div className="text-3xl sm:text-4xl mb-3 sm:mb-4 text-indigo-600">🎧</div>
+                <div className="relative z-10 mb-3 sm:mb-4 w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-indigo-500/10 dark:bg-indigo-400/10 text-indigo-600 dark:text-indigo-300 flex items-center justify-center">
+                  <Headphones className="w-6 h-6 sm:w-7 sm:h-7" />
+                </div>
                 <h3 className="text-base sm:text-lg md:text-xl font-semibold text-gray-900 dark:text-white mb-2 sm:mb-3">
                   Круглосуточная поддержка
                 </h3>
