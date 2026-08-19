@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { ostrovokClient } from '@/lib/ostrovok/client';
 import { checkRateLimit, getUserKey } from '@/lib/rate-limiter';
+import { bookingCreateSchema } from '@/lib/validation';
 
 export const runtime = 'nodejs';
 
@@ -14,7 +15,16 @@ export async function POST(req: Request) {
 
   try {
     const body = await req.json();
-    const { bookHash, partnerOrderId, rooms, user, partner, language } = body;
+    const parsed = bookingCreateSchema.safeParse(body);
+
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: 'Invalid booking params', details: parsed.error.flatten() },
+        { status: 400 }
+      );
+    }
+
+    const { bookHash, partnerOrderId, rooms, user, partner, language } = parsed.data;
 
     if (!bookHash || !partnerOrderId || !rooms?.length || !user?.email) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { ostrovokClient } from '@/lib/ostrovok/client';
 import { checkRateLimit, getUserKey } from '@/lib/rate-limiter';
+import { ratesRequestSchema } from '@/lib/validation';
 
 export const runtime = 'nodejs';
 
@@ -13,7 +14,16 @@ export async function POST(req: Request, { params }: { params: Promise<{ slug: s
   try {
     const { slug } = await params;
     const body = await req.json();
-    const { checkin, checkout, guests, residency = 'RU', timeout = 30 } = body;
+    const parsed = ratesRequestSchema.safeParse(body);
+
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: 'Invalid rates request params', details: parsed.error.flatten() },
+        { status: 400 }
+      );
+    }
+
+    const { checkin, checkout, guests, residency, timeout } = parsed.data;
 
     if (!checkin || !checkout) {
       return NextResponse.json({ error: 'checkin and checkout are required' }, { status: 400 });

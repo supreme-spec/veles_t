@@ -4,6 +4,7 @@ import { db } from '@/db';
 import { hotels } from '@/db/schema';
 import { eq, sql } from 'drizzle-orm';
 import { getCached, setCached } from '@/lib/redis';
+import { searchQuerySchema } from '@/lib/validation';
 
 export const runtime = 'nodejs';
 
@@ -72,27 +73,23 @@ async function upsertHotel(h: any) {
 
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
-  const query = (searchParams.get('q') || '').trim();
-  const checkin = searchParams.get('checkin');
-  const checkout = searchParams.get('checkout');
-  const adults = Math.max(1, Math.min(10, Number(searchParams.get('adults') || '2')));
-  const childrenParam = searchParams.get('children');
-  let children: number[] = [];
+  const parsed = searchQuerySchema.safeParse({
+    q: searchParams.get('q'),
+    checkin: searchParams.get('checkin'),
+    checkout: searchParams.get('checkout'),
+    adults: searchParams.get('adults'),
+    children: searchParams.get('children'),
+    residency: searchParams.get('residency'),
+  });
 
-  if (childrenParam) {
-    try {
-      const parsed = JSON.parse(childrenParam);
-      if (Array.isArray(parsed)) {
-        children = parsed
-          .map((a: any) => Number(a))
-          .filter((age: number) => !isNaN(age) && age >= 0 && age <= 17);
-      }
-    } catch {
-      children = [];
-    }
+  if (!parsed.success) {
+    return NextResponse.json(
+      { error: 'Invalid search params', details: parsed.error.flatten() },
+      { status: 400 }
+    );
   }
 
-  const residency = searchParams.get('residency') || 'RU';
+  const { q: query, checkin, checkout, adults, children, residency } = parsed.data;
 
   try {
     if (!query) {
