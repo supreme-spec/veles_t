@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { SearchFilters, type Filters } from '@/components/hotels/SearchFilters';
 import { HotelMap, type HotelMapPoint } from '@/components/hotels/HotelMap';
+import { OptimizedHotelImage } from '@/components/hotels/OptimizedHotelImage';
 import { formatPrice, getMealTypeLabel, formatCancellationDate } from '@/lib/price-helpers';
 
 interface Suggestion {
@@ -451,11 +452,11 @@ export function HotelSearch() {
             {filteredResults.map((hotel) => (
               <div key={hotel.id} className="bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden flex flex-col">
                 <div className="relative w-full h-64 bg-slate-100 overflow-hidden">
-                  {hotel.images?.[0]?.medium ? (
-                    <img src={hotel.images[0].medium} alt={hotel.name} className="w-full h-full object-cover" />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center text-gray-400">Нет фото</div>
-                  )}
+                <OptimizedHotelImage
+                  src={hotel.images?.[0]?.medium}
+                  alt={hotel.name}
+                  className="w-full h-full"
+                />
                 </div>
               <div className="p-6 flex-1 flex flex-col">
                 <div className="flex gap-0.5 mb-1.5">
