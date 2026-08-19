@@ -142,10 +142,12 @@ export function Navbar() {
   return (
     <>
       <nav
-        className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${isScrolled
-          ? 'bg-white/95 dark:bg-gray-900/95 backdrop-blur-md shadow-lg'
-          : 'bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm'
-          }`}
+        className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${
+          mounted && isScrolled
+            ? 'bg-white/95 dark:bg-gray-900/95 backdrop-blur-md shadow-lg'
+            : 'bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm'
+        }`}
+        suppressHydrationWarning
       >
         {/* Декоративная полоса в цветах флага России */}
         <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-white via-blue-600 to-red-600"></div>
@@ -323,6 +325,7 @@ export function Navbar() {
                   onClick={toggleTheme}
                   className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 transition-colors flex-shrink-0"
                   title={theme === 'dark' ? 'Светлая тема' : 'Тёмная тема'}
+                  suppressHydrationWarning
                 >
                   {theme === 'dark' ? (
                     <SunIcon className="w-5 h-5" />
@@ -342,6 +345,7 @@ export function Navbar() {
                   onClick={toggleTheme}
                   className="p-1.5 sm:p-2 rounded-lg bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 transition-colors"
                   title={theme === 'dark' ? 'Светлая тема' : 'Тёмная тема'}
+                  suppressHydrationWarning
                 >
                   {theme === 'dark' ? (
                     <SunIcon className="w-4 h-4 sm:w-5 sm:h-5" />
