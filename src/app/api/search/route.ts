@@ -5,6 +5,7 @@ import { hotels } from '@/db/schema';
 import { eq, sql } from 'drizzle-orm';
 import { getCached, setCached } from '@/lib/redis';
 import { CACHE_TTL, getCacheKey } from '@/lib/cache-strategy';
+import { measure } from '@/lib/performance-monitor';
 import { searchQuerySchema } from '@/lib/validation';
 
 export const runtime = 'nodejs';
@@ -144,25 +145,30 @@ export async function GET(req: Request) {
 
       try {
         const guestBase = { adults };
-        const searchResult = coords
-          ? await ostrovokClient.searchByGeo({
-              lat: coords.lat,
-              lon: coords.lon,
-              radius: 20,
-              checkin,
-              checkout,
-              guests: children.length > 0 ? [{ ...guestBase, children }] : [guestBase],
-              residency,
-            })
-          : await ostrovokClient.searchByGeo({
-              lat: 55.7558,
-              lon: 37.6173,
-              radius: 50,
-              checkin,
-              checkout,
-              guests: children.length > 0 ? [{ ...guestBase, children }] : [guestBase],
-              residency,
-            });
+        const searchResult = await measure(
+          'search',
+          async () =>
+            coords
+              ? await ostrovokClient.searchByGeo({
+                  lat: coords.lat,
+                  lon: coords.lon,
+                  radius: 20,
+                  checkin,
+                  checkout,
+                  guests: children.length > 0 ? [{ ...guestBase, children }] : [guestBase],
+                  residency,
+                })
+              : await ostrovokClient.searchByGeo({
+                  lat: 55.7558,
+                  lon: 37.6173,
+                  radius: 50,
+                  checkin,
+                  checkout,
+                  guests: children.length > 0 ? [{ ...guestBase, children }] : [guestBase],
+                  residency,
+                }),
+          () => ({ status: 'error' as const, data: { hotels: [] } })
+        );
 
         if (searchResult?.status === 'ok' && Array.isArray(searchResult.data?.hotels)) {
           const saved = await Promise.allSettled(
