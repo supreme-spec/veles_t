@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { ostrovokClient } from '@/lib/ostrovok/client';
 import { checkRateLimit, getUserKey } from '@/lib/rate-limiter';
 import { ratesRequestSchema } from '@/lib/validation';
+import { CACHE_TTL, getCacheKey } from '@/lib/cache-strategy';
 
 export const runtime = 'nodejs';
 

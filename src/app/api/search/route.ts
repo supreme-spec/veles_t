@@ -4,6 +4,7 @@ import { db } from '@/db';
 import { hotels } from '@/db/schema';
 import { eq, sql } from 'drizzle-orm';
 import { getCached, setCached } from '@/lib/redis';
+import { CACHE_TTL, getCacheKey } from '@/lib/cache-strategy';
 import { searchQuerySchema } from '@/lib/validation';
 
 export const runtime = 'nodejs';
@@ -127,7 +128,7 @@ export async function GET(req: Request) {
     }
 
     const lowerQuery = query.toLowerCase().trim();
-    const cacheKey = `search:${Buffer.from(`${lowerQuery}:${checkin}:${checkout}:${adults}:${JSON.stringify(children)}:${residency}`).toString('base64')}`;
+    const cacheKey = getCacheKey('search', { q: lowerQuery, checkin, checkout, adults, children, residency });
 
     try {
       const cached = await getCached<any>(cacheKey);
@@ -176,7 +177,7 @@ export async function GET(req: Request) {
           const payload = { results, source: 'ostrovok', cached: false };
 
           try {
-            await setCached(cacheKey, payload, 900);
+            await setCached(cacheKey, payload, CACHE_TTL.SEARCH_RESULTS);
           } catch (e) {
             console.warn('[SEARCH] Cache write failed:', e);
           }
@@ -216,7 +217,7 @@ export async function GET(req: Request) {
     const localPayload = { results: localResults, source: 'local', cached: false };
 
     try {
-      await setCached(cacheKey, localPayload, 900);
+      await setCached(cacheKey, localPayload, CACHE_TTL.SEARCH_RESULTS);
     } catch (e) {
       // ignore cache write errors
     }
