@@ -5,6 +5,7 @@ import { SearchFilters, type Filters } from '@/components/hotels/SearchFilters';
 import { HotelMap, type HotelMapPoint } from '@/components/hotels/HotelMap';
 import { OptimizedHotelImage } from '@/components/hotels/OptimizedHotelImage';
 import { formatPrice, getMealTypeLabel, formatCancellationDate } from '@/lib/price-helpers';
+import { analytics } from '@/lib/analytics';
 
 interface Suggestion {
   text: string;
@@ -125,12 +126,14 @@ export function HotelSearch() {
     inputRef.current?.blur();
   };
 
-  const handleSearch = async (e: React.FormEvent) => {
+   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setSearched(true);
     setError(null);
     setShowSuggestions(false);
+
+    const startTime = Date.now();
 
     try {
       const url = new URL('/api/search', window.location.origin);
@@ -153,6 +156,15 @@ export function HotelSearch() {
 
       if (data.results && Array.isArray(data.results)) {
         setResults(data.results);
+        analytics.track({
+          name: 'hotel_search',
+          params: {
+            query,
+            results_count: data.results.length,
+            filters_applied: Object.values(filters).filter((v) => Array.isArray(v) ? v.length > 0 : v).length,
+            search_duration_ms: Date.now() - startTime,
+          },
+        });
       } else {
         setResults([]);
       }
@@ -402,7 +414,11 @@ export function HotelSearch() {
             <div className="flex gap-2">
               <button
                 type="button"
-                onClick={() => setView('list')}
+                onClick={() => {
+                  const next = view === 'list' ? 'map' : 'list';
+                  setView(next);
+                  analytics.track({ name: 'map_view_toggle', params: { view: next, results_count: filteredResults.length } });
+                }}
                 className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${
                   view === 'list' ? 'bg-blue-900 text-white' : 'bg-white border border-slate-200 text-slate-700'
                 }`}
@@ -411,7 +427,11 @@ export function HotelSearch() {
               </button>
               <button
                 type="button"
-                onClick={() => setView('map')}
+                onClick={() => {
+                  const next = view === 'map' ? 'list' : 'map';
+                  setView(next);
+                  analytics.track({ name: 'map_view_toggle', params: { view: next, results_count: filteredResults.length } });
+                }}
                 className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${
                   view === 'map' ? 'bg-blue-900 text-white' : 'bg-white border border-slate-200 text-slate-700'
                 }`}
