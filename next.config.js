@@ -254,7 +254,8 @@ const nextConfig = {
                 'https://*.travelpayouts.com https://photo.hotellook.com https://cdn.travelpayouts.com ' +
                 'https://*.level.travel https://*.travelata.ru https://*.bronevik.com ' +
                 'https://q-cf.bstatic.com https://r-cf.bstatic.com ' +
-                'https://*.aviakassa.com',
+                'https://*.aviakassa.com ' +
+                'https://images.unsplash.com https://plus.unsplash.com',
               "media-src 'self' https:",
               "font-src 'self' https: data:",
               "style-src 'self' 'unsafe-inline' https: " +
@@ -264,7 +265,7 @@ const nextConfig = {
                 'https://widgets.aviakassa.com https://api4.aviakassa.com',
               "connect-src 'self' wss: https: " +
                 'https://bitrix.infoflot.com https://widgets.aviakassa.com https://api4.aviakassa.com ' +
-                'https://images.unsplash.com https://tiles.openfreemap.org https://demotiles.maplibre.org ' +
+                'https://images.unsplash.com https://plus.unsplash.com https://tiles.openfreemap.org https://demotiles.maplibre.org ' +
                 'https://api-maps.yandex.ru https://geocode-maps.yandex.ru https://*.maps.yandex.net ' +
                 'https://*.ostrovok.ru https://*.travelpayouts.com https://*.level.travel https://*.bronevik.com',
               "frame-src 'self' https: " +

@@ -401,12 +401,6 @@ export function HotelSearch() {
         </div>
       )}
 
-      {searched && results.length > 0 && filteredResults.length === 0 && !loading && !error && (
-        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-12 text-center">
-          <p className="text-slate-500 text-lg">По выбранным фильтрам ничего не найдено. Попробуйте изменить параметры.</p>
-        </div>
-      )}
-
       {results.length > 0 && (
         <>
           <div className="flex items-center justify-between max-w-7xl mx-auto mb-4">
@@ -462,68 +456,68 @@ export function HotelSearch() {
             />
           ) : (
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-          <aside className="lg:col-span-1">
-            <div className="bg-white dark:bg-gray-800 rounded-2xl border border-slate-100 shadow-sm p-5">
-              <h3 className="text-sm font-semibold text-slate-900 mb-3">Фильтры</h3>
-              <SearchFilters filters={filters} onChange={setFilters} />
+              <aside className="lg:col-span-1">
+                <div className="bg-white dark:bg-gray-800 rounded-2xl border border-slate-100 shadow-sm p-5">
+                  <h3 className="text-sm font-semibold text-slate-900 mb-3">Фильтры</h3>
+                  <SearchFilters filters={filters} onChange={setFilters} />
+                </div>
+              </aside>
+              <div className="lg:col-span-3 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {filteredResults.map((hotel) => (
+                  <div key={hotel.id} className="bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden flex flex-col">
+                    <div className="relative w-full h-64 bg-slate-100 overflow-hidden">
+                      <OptimizedHotelImage
+                        src={hotel.images?.[0]?.medium}
+                        alt={hotel.name}
+                        className="w-full h-full"
+                      />
+                    </div>
+                    <div className="p-6 flex-1 flex flex-col">
+                      <div className="flex gap-0.5 mb-1.5">
+                        {Array.from({ length: hotel.stars || 0 }).map((_, i) => (
+                          <span key={i} className="text-amber-500 text-sm">★</span>
+                        ))}
+                      </div>
+                      <h2 className="text-xl font-extrabold text-slate-900">{hotel.name}</h2>
+                      <p className="text-xs text-slate-400 mt-1">{hotel.city}, {hotel.country}</p>
+                      <div className="mt-3 space-y-1">
+                        {hotel.minPrice != null && (
+                          <div className="flex items-baseline gap-2">
+                            <span className="text-lg font-bold text-slate-900">{formatPrice(hotel.minPrice)}</span>
+                            {!hotel.taxesIncluded && (
+                              <span className="text-xs text-orange-600">+налоги</span>
+                            )}
+                          </div>
+                        )}
+                        {hotel.mealType && (
+                          <div className="flex items-center gap-1 text-sm text-slate-600">
+                            <span>🍽️</span>
+                            <span>{getMealTypeLabel(hotel.mealType)}</span>
+                          </div>
+                        )}
+                        {hotel.freeCancellationBefore && (
+                          <div className="flex items-center gap-1 text-sm text-green-600">
+                            <span>✓</span>
+                            <span>Бесплатная отмена до {formatCancellationDate(hotel.freeCancellationBefore)}</span>
+                          </div>
+                        )}
+                      </div>
+                      <a
+                        href={getOstrovokUrl(hotel)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="mt-4 bg-blue-900 hover:bg-blue-800 text-white font-bold text-sm px-4 py-2.5 rounded-xl transition-colors text-center"
+                      >
+                        Забронировать
+                      </a>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
-          </aside>
-          <div className="lg:col-span-3 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredResults.map((hotel) => (
-              <div key={hotel.id} className="bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden flex flex-col">
-                <div className="relative w-full h-64 bg-slate-100 overflow-hidden">
-                <OptimizedHotelImage
-                  src={hotel.images?.[0]?.medium}
-                  alt={hotel.name}
-                  className="w-full h-full"
-                />
-                </div>
-              <div className="p-6 flex-1 flex flex-col">
-                <div className="flex gap-0.5 mb-1.5">
-                  {Array.from({ length: hotel.stars || 0 }).map((_, i) => (
-                    <span key={i} className="text-amber-500 text-sm">★</span>
-                  ))}
-                </div>
-                <h2 className="text-xl font-extrabold text-slate-900">{hotel.name}</h2>
-                <p className="text-xs text-slate-400 mt-1">{hotel.city}, {hotel.country}</p>
-                <div className="mt-3 space-y-1">
-                  {hotel.minPrice != null && (
-                    <div className="flex items-baseline gap-2">
-                      <span className="text-lg font-bold text-slate-900">{formatPrice(hotel.minPrice)}</span>
-                      {!hotel.taxesIncluded && (
-                        <span className="text-xs text-orange-600">+налоги</span>
-                      )}
-                    </div>
-                  )}
-                  {hotel.mealType && (
-                    <div className="flex items-center gap-1 text-sm text-slate-600">
-                      <span>🍽️</span>
-                      <span>{getMealTypeLabel(hotel.mealType)}</span>
-                    </div>
-                  )}
-                  {hotel.freeCancellationBefore && (
-                    <div className="flex items-center gap-1 text-sm text-green-600">
-                      <span>✓</span>
-                      <span>Бесплатная отмена до {formatCancellationDate(hotel.freeCancellationBefore)}</span>
-                    </div>
-                  )}
-                </div>
-                <a
-                  href={getOstrovokUrl(hotel)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="mt-4 bg-blue-900 hover:bg-blue-800 text-white font-bold text-sm px-4 py-2.5 rounded-xl transition-colors text-center"
-                >
-                  Забронировать
-                </a>
-              </div>
-              </div>
-            ))}
-          </div>
-        </div>
+          )}
+        </>
       )}
     </>
   );
 }
-
-
