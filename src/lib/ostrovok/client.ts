@@ -73,29 +73,30 @@ export class OstrovokClient {
   }
 
   async getHotelDump() {
-    const response = await this.client.get('/b2b/v3/hotel/info/dump/', {
-      params: { language: 'ru' },
+    const response = await this.client.post('/b2b/v3/hotel/info/dump/', {
+      language: 'ru',
     });
     return response.data;
   }
 
   async getIncrementalDump() {
-    const response = await this.client.get('/b2b/v3/hotel/info/incremental_dump/', {
-      params: { language: 'ru' },
+    const response = await this.client.post('/b2b/v3/hotel/info/incremental_dump/', {
+      language: 'ru',
     });
     return response.data;
   }
 
   async getRegionsDump() {
-    const response = await this.client.get('/b2b/v3/hotel/region/dump/', {
-      params: { language: 'ru' },
+    const response = await this.client.post('/b2b/v3/hotel/region/dump/', {
+      language: 'ru',
     });
     return response.data;
   }
 
   async getHotelContent(hid: number) {
-    const response = await this.client.get('/b2b/v3/hotel/info/', {
-      params: { hid, language: 'ru' },
+    const response = await this.client.post('/b2b/v3/hotel/info/', {
+      hid,
+      language: 'ru',
     });
     return response.data;
   }
