@@ -62,6 +62,7 @@ export function HotelSearch() {
   const [adults, setAdults] = useState('2');
   const [childrenCount, setChildrenCount] = useState('0');
   const [childrenAges, setChildrenAges] = useState<number[]>([]);
+  const [residency, setResidency] = useState('RU');
   const [results, setResults] = useState<Hotel[]>([]);
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
@@ -141,6 +142,7 @@ export function HotelSearch() {
       if (checkin) url.searchParams.set('checkin', checkin);
       if (checkout) url.searchParams.set('checkout', checkout);
       url.searchParams.set('adults', adults);
+      url.searchParams.set('residency', residency);
       if (childrenCount !== '0' && childrenAges.length > 0) {
         url.searchParams.set('children', JSON.stringify(childrenAges));
       }
@@ -202,6 +204,27 @@ export function HotelSearch() {
     setSearched(false);
     setResults([]);
     setError(null);
+    
+    // Set residency based on country
+    const residencyMap: Record<string, string> = {
+      'russia': 'RU',
+      'kazakhstan': 'KZ',
+      'uzbekistan': 'UZ',
+      'belarus': 'BY',
+      'ukraine': 'UA',
+      'kyrgyzstan': 'KG',
+      'tajikistan': 'TJ',
+      'armenia': 'AM',
+      'azerbaijan': 'AZ',
+      'georgia': 'GE',
+      'turkey': 'TR',
+      'uae': 'AE',
+      'thailand': 'TH',
+      'vietnam': 'VN',
+      'china': 'CN',
+      'india': 'IN',
+    };
+    setResidency(residencyMap[city.countrySlug] || 'RU');
   };
 
   const getOstrovokUrl = (hotel: Hotel) => {
@@ -355,6 +378,38 @@ export function HotelSearch() {
                 ))}
               </div>
             )}
+
+            <div>
+              <label className="block text-xs text-slate-500 mb-1">Гражданство</label>
+              <select
+                value={residency}
+                onChange={(e) => setResidency(e.target.value)}
+                className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="RU">Россия</option>
+                <option value="KZ">Казахстан</option>
+                <option value="UZ">Узбекистан</option>
+                <option value="BY">Беларусь</option>
+                <option value="UA">Украина</option>
+                <option value="KG">Кыргызстан</option>
+                <option value="TJ">Таджикистан</option>
+                <option value="AM">Армения</option>
+                <option value="AZ">Азербайджан</option>
+                <option value="GE">Грузия</option>
+                <option value="TR">Турция</option>
+                <option value="AE">ОАЭ</option>
+                <option value="TH">Таиланд</option>
+                <option value="VN">Вьетнам</option>
+                <option value="CN">Китай</option>
+                <option value="IN">Индия</option>
+                <option value="DE">Германия</option>
+                <option value="IT">Италия</option>
+                <option value="ES">Испания</option>
+                <option value="FR">Франция</option>
+                <option value="GB">Великобритания</option>
+                <option value="US">США</option>
+              </select>
+            </div>
 
             <button
               type="submit"
