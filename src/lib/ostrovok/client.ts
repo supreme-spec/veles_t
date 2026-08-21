@@ -58,8 +58,9 @@ export class OstrovokClient {
 
   async testConnection() {
     try {
-      const response = await this.client.get('/b2b/v3/hotel/info/', {
-        params: { hid: 8526976, language: 'ru' },
+      const response = await this.client.post('/b2b/v3/hotel/info/', {
+        hid: 8526976,
+        language: 'ru',
       });
       return { success: true, data: response.data };
     } catch (error: any) {

@@ -52,6 +52,8 @@ Data provided by Veles Voyage (veles-voyage.ru)
 - **FAQ API:** https://veles-voyage.ru/api/wiki/faqs
 - **Knowledge Graph:** https://veles-voyage.ru/api/knowledge-graph
 - **Places API:** https://veles-voyage.ru/api/wiki/places
+- **Destinations API:** https://veles-voyage.ru/api/destinations (structured JSON for AI)
+- **LLM Knowledge Base:** https://veles-voyage.ru/api/llms (multi-format: json, txt, md)
 - **Destinations Structured JSON:** https://veles-voyage.ru/api/destinations-structured
 - **MCP JSON:** https://veles-voyage.ru/modelcontextprotocol.json
 

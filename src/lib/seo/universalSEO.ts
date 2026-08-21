@@ -42,6 +42,8 @@ export interface UniversalSEOOptions {
   modifiedTime?: string;
   author?: string;
   politicalStatus?: string;
+  wikidataId?: string;
+  hasParts?: string[];
 }
 
 // ============================================
@@ -380,6 +382,12 @@ export async function generateUniversalSchemas(options: UniversalSEOOptions): Pr
           "@type": "Country",
           "name": countryNameClean,
           "sameAs": [`https://ru.wikipedia.org/wiki/${encodeURIComponent(countryNameClean)}`],
+          ...(options.wikidataId && {
+            "sameAs": [
+              `https://ru.wikipedia.org/wiki/${encodeURIComponent(countryNameClean)}`,
+              `https://www.wikidata.org/wiki/${options.wikidataId}`
+            ]
+          }),
           ...(geo && {
             "geo": {
               "@type": "GeoCoordinates",
@@ -388,6 +396,20 @@ export async function generateUniversalSchemas(options: UniversalSEOOptions): Pr
             }
           })
         },
+        ...(options.wikidataId && {
+          "mentions": {
+            "@type": "Thing",
+            "@id": `https://www.wikidata.org/wiki/${options.wikidataId}`,
+            "sameAs": [`https://ru.wikipedia.org/wiki/${encodeURIComponent(countryNameClean)}`]
+          }
+        }),
+        ...(options.hasParts && options.hasParts.length > 0 && {
+          "hasPart": options.hasParts.map((part: string, index: number) => ({
+            "@type": "WebPageElement",
+            "name": part,
+            "position": index + 1
+          }))
+        }),
         "touristType": ["Туристы", "Семьи с детьми", "Молодожёны", "Бэкпекеры"],
         ...(options.keywords && options.keywords.length > 0 && {
           "keywords": options.keywords.join(', ')
