@@ -315,9 +315,9 @@ export function HotelSearch() {
 
   return (
     <>
-      <form onSubmit={handleSearch} className="max-w-3xl mx-auto mb-12">
+      <form onSubmit={handleSearch} className="max-w-3xl mx-auto mb-12" suppressHydrationWarning>
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-6 border border-gray-200 dark:border-gray-700">
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-4" suppressHydrationWarning>
             <div className="flex items-center justify-between gap-3">
               <div className="inline-flex rounded-xl bg-slate-100 dark:bg-slate-700 p-1" role="tablist" aria-label="Тип размещения">
                 <button
