@@ -347,7 +347,6 @@ export function HotelSearch() {
                   Жильё
                 </button>
               </div>
-              <span className="text-xs font-medium text-slate-500 dark:text-slate-300">Ostrovok.ru</span>
             </div>
             <div className="relative">
               <input
@@ -512,7 +511,7 @@ export function HotelSearch() {
                   }}
                   className="rounded border-amber-300"
                 />
-                Тестовый режим Ostrovok
+                Тестовый режим
               </label>
               {testMode && (
                 <div className="mt-3">
@@ -756,6 +755,7 @@ export function HotelSearch() {
             initialCheckout={checkout}
             cancellationPolicies={selectedRate.rate.cancellation_penalties}
             taxes={selectedRate.rate.payment_options?.payment_types?.[0]?.tax_data?.taxes}
+            residency={residency}
           />
         </div>
       )}

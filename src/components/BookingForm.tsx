@@ -10,6 +10,7 @@ interface BookingFormProps {
   initialBookHash?: string;
   initialCheckin?: string;
   initialCheckout?: string;
+  residency?: string;
 }
 
 type BookingStep = 'form' | 'prebook' | 'booking' | '3ds' | 'success' | 'error';
@@ -34,6 +35,7 @@ export function BookingForm({
   initialBookHash,
   initialCheckin,
   initialCheckout,
+  residency,
 }: BookingFormProps) {
   const [step, setStep] = useState<BookingStep>('form');
   const [checkin, setCheckin] = useState(initialCheckin || '');
@@ -138,6 +140,7 @@ export function BookingForm({
           partner: {
             partnerOrderId: partnerOrderIdValue,
           },
+          residency: residency || 'RU',
           language: 'ru',
         }),
       });
@@ -194,6 +197,7 @@ export function BookingForm({
               last_name: guestData.lastName,
             },
             partner: { partnerOrderId: currentOrderId },
+            residency: residency || 'RU',
             paymentType: { type: 'hotel' },
             language: 'ru',
           }),
@@ -212,7 +216,12 @@ export function BookingForm({
         }
 
         lastError = data.error;
-        if (attempt < maxRetries && ['timeout', 'unknown'].includes(data.status)) {
+        const RETRYABLE_ERRORS = ['timeout', 'unknown', 'duplicate_reservation', 'double_booking_form'];
+        const isRetryable = (data.status === 'error' &&
+          RETRYABLE_ERRORS.some(e => data.error?.includes(e))) ||
+          (!res.ok && res.status >= 500);
+
+        if (attempt < maxRetries && isRetryable) {
           await new Promise(resolve => setTimeout(resolve, 1000 * attempt));
           continue;
         }
@@ -274,8 +283,45 @@ export function BookingForm({
   if (step === 'success') {
     return (
       <div className="bg-green-50 border border-green-200 text-green-800 rounded-xl p-6">
-        <h3 className="text-lg font-bold mb-2">Бронирование подтверждено</h3>
-        <p className="text-sm">Ваш заказ в отеле {hotelName} успешно создан. Номер заказа: {partnerOrderId}</p>
+        <h3 className="text-lg font-bold mb-2">Бронирование подтверждено ✅</h3>
+        <p className="text-sm">
+          Ваш заказ в отеле <strong>{hotelName}</strong> успешно создан.<br/>
+          Номер заказа: <code className="bg-white px-2 py-1 rounded">{partnerOrderId}</code>
+        </p>
+        <div className="mt-4 flex gap-3">
+          <button
+            onClick={async () => {
+              if (!partnerOrderId) return;
+              if (!confirm('Вы уверены, что хотите отменить бронирование?')) return;
+              setLoading(true);
+              try {
+                const res = await fetch('/api/booking/cancel', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ partnerOrderId }),
+                });
+                const data = await res.json();
+                if (res.ok) {
+                  alert('Бронирование успешно отменено');
+                  setStep('form');
+                } else {
+                  alert('Ошибка отмены: ' + (data.error || 'Unknown error'));
+                }
+              } catch (err) {
+                alert('Ошибка сети при отмене');
+              } finally {
+                setLoading(false);
+              }
+            }}
+            disabled={loading}
+            className="bg-red-600 hover:bg-red-700 text-white font-bold text-sm px-4 py-2 rounded-xl disabled:opacity-50"
+          >
+            {loading ? 'Отмена...' : 'Отменить бронирование'}
+          </button>
+        </div>
+        <p className="mt-3 text-xs text-amber-700 bg-amber-50 p-2 rounded">
+          ⚠️ Для тестовых бронирований обязательно отмените заказ после проверки
+        </p>
       </div>
     );
   }
