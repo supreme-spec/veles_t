@@ -24,7 +24,8 @@ export async function GET(_req: Request, { params }: { params: Promise<{ hid: st
 
     if (staleHours > 24 || !hotel.description) {
       try {
-        const content = await ostrovokClient.getHotelContent(hotel.ostrovokHid);
+        const contentResponse = await ostrovokClient.getHotelContent(hotel.ostrovokHid);
+        const content = contentResponse?.data?.data || contentResponse?.data || contentResponse;
 
         const payload: any = {
           lastSyncedAt: new Date(),

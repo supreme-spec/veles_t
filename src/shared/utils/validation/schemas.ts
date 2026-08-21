@@ -23,7 +23,12 @@ export const wikiPageSchema = z.object({
 
 // Схема для поиска
 export const searchQuerySchema = z.object({
-  q: z.string().min(2).max(100),
+  q: z.string().min(1).max(100),
+  checkin: z.string().optional(),
+  checkout: z.string().optional(),
+  adults: z.string().optional(),
+  children: z.string().optional(),
+  residency: z.string().optional(),
   limit: z.number().int().min(1).max(50).optional(),
   offset: z.number().int().min(0).optional(),
 });

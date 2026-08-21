@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useMemo } from 'react';
 import { SearchFilters, type Filters } from '@/components/hotels/SearchFilters';
 import { HotelMap, type HotelMapPoint } from '@/components/hotels/HotelMap';
 import { OptimizedHotelImage } from '@/components/hotels/OptimizedHotelImage';
+import { BookingForm } from '@/components/BookingForm';
 import { formatPrice, getMealTypeLabel, formatCancellationDate } from '@/lib/price-helpers';
 import { analytics } from '@/lib/analytics';
 
@@ -30,6 +31,17 @@ interface Hotel {
   mealType?: string | null;
   freeCancellationBefore?: string | Date | null;
   amenities?: string[];
+  availability?: boolean;
+}
+
+interface HotelRate {
+  book_hash?: string;
+  match_hash?: string;
+  meal?: string;
+  room_name?: string;
+  daily_prices?: string[];
+  payment_options?: { payment_types?: Array<{ show_amount?: string; show_currency_code?: string; tax_data?: { taxes?: any[] } }> };
+  cancellation_penalties?: any;
 }
 
 function getDefaultCheckDates() {
@@ -63,6 +75,9 @@ export function HotelSearch() {
   const [childrenCount, setChildrenCount] = useState('0');
   const [childrenAges, setChildrenAges] = useState<number[]>([]);
   const [residency, setResidency] = useState('RU');
+  const [testMode, setTestMode] = useState(false);
+  const [testHotelId, setTestHotelId] = useState('8526976');
+  const [productMode, setProductMode] = useState<'hotels' | 'housing'>('hotels');
   const [results, setResults] = useState<Hotel[]>([]);
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
@@ -76,6 +91,9 @@ export function HotelSearch() {
     freeCancellation: false,
   });
   const [view, setView] = useState<'list' | 'map'>('list');
+  const [selectedRate, setSelectedRate] = useState<{ hotel: Hotel; rate: HotelRate } | null>(null);
+  const [ratesByHotel, setRatesByHotel] = useState<Record<string, HotelRate[]>>({});
+  const [ratesLoading, setRatesLoading] = useState<string | null>(null);
 
   const inputRef = useRef<HTMLInputElement>(null);
   const suggestionsRef = useRef<HTMLDivElement>(null);
@@ -143,6 +161,10 @@ export function HotelSearch() {
       if (checkout) url.searchParams.set('checkout', checkout);
       url.searchParams.set('adults', adults);
       url.searchParams.set('residency', residency);
+      if (testMode) {
+        url.searchParams.set('testMode', '1');
+        url.searchParams.set('hotelId', testHotelId);
+      }
       if (childrenCount !== '0' && childrenAges.length > 0) {
         url.searchParams.set('children', JSON.stringify(childrenAges));
       }
@@ -261,11 +283,72 @@ export function HotelSearch() {
     });
   }, [results, filters]);
 
+  const loadHotelRates = async (hotel: Hotel) => {
+    if (!hotel.ostrovokHid) return;
+    const key = String(hotel.ostrovokHid);
+    if (ratesByHotel[key]) return;
+    setRatesLoading(key);
+    setError(null);
+    try {
+      const response = await fetch(`/api/hotels/${hotel.ostrovokHid}/rates`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          checkin,
+          checkout,
+          guests: [{ adults: Number(adults), children: childrenAges }],
+          residency,
+          timeout: 30000,
+        }),
+      });
+      const data = await response.json();
+      if (!response.ok || !Array.isArray(data.rates)) {
+        throw new Error(data.error || 'Не удалось загрузить тарифы');
+      }
+      setRatesByHotel((current) => ({ ...current, [key]: data.rates }));
+    } catch (loadError) {
+      setError(loadError instanceof Error ? loadError.message : 'Не удалось загрузить тарифы');
+    } finally {
+      setRatesLoading(null);
+    }
+  };
+
   return (
     <>
       <form onSubmit={handleSearch} className="max-w-3xl mx-auto mb-12">
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-6 border border-gray-200 dark:border-gray-700">
           <div className="flex flex-col gap-4">
+            <div className="flex items-center justify-between gap-3">
+              <div className="inline-flex rounded-xl bg-slate-100 dark:bg-slate-700 p-1" role="tablist" aria-label="Тип размещения">
+                <button
+                  type="button"
+                  role="tab"
+                  aria-selected={productMode === 'hotels'}
+                  onClick={() => setProductMode('hotels')}
+                  className={`rounded-lg px-4 py-2 text-sm font-bold transition-colors ${
+                    productMode === 'hotels'
+                      ? 'bg-white text-blue-900 shadow-sm dark:bg-slate-900 dark:text-white'
+                      : 'text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white'
+                  }`}
+                >
+                  Отели
+                </button>
+                <button
+                  type="button"
+                  role="tab"
+                  aria-selected={productMode === 'housing'}
+                  onClick={() => setProductMode('housing')}
+                  className={`rounded-lg px-4 py-2 text-sm font-bold transition-colors ${
+                    productMode === 'housing'
+                      ? 'bg-white text-blue-900 shadow-sm dark:bg-slate-900 dark:text-white'
+                      : 'text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white'
+                  }`}
+                >
+                  Жильё
+                </button>
+              </div>
+              <span className="text-xs font-medium text-slate-500 dark:text-slate-300">Ostrovok.ru</span>
+            </div>
             <div className="relative">
               <input
                 ref={inputRef}
@@ -273,9 +356,10 @@ export function HotelSearch() {
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 onFocus={() => setShowSuggestions(true)}
-                placeholder="Город, отель или страна"
+                placeholder={productMode === 'housing' ? 'Город, квартира или апартаменты' : 'Город, отель или страна'}
                 className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 autoComplete="off"
+                suppressHydrationWarning
               />
 
               {showSuggestions && suggestions.length > 0 && (
@@ -316,6 +400,7 @@ export function HotelSearch() {
                   value={checkin}
                   onChange={(e) => setCheckin(e.target.value)}
                   className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
+                  suppressHydrationWarning
                 />
               </div>
               <div>
@@ -325,6 +410,7 @@ export function HotelSearch() {
                   value={checkout}
                   onChange={(e) => setCheckout(e.target.value)}
                   className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
+                  suppressHydrationWarning
                 />
               </div>
               <div>
@@ -333,6 +419,7 @@ export function HotelSearch() {
                   value={adults}
                   onChange={(e) => setAdults(e.target.value)}
                   className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
+                  suppressHydrationWarning
                 >
                   {[1, 2, 3, 4, 5, 6].map((n) => (
                     <option key={n} value={n}>
@@ -349,6 +436,7 @@ export function HotelSearch() {
                 value={childrenCount}
                 onChange={(e) => handleChildrenCountChange(e.target.value)}
                 className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
+                suppressHydrationWarning
               >
                 {[0, 1, 2, 3, 4].map((n) => (
                   <option key={n} value={n}>
@@ -385,6 +473,7 @@ export function HotelSearch() {
                 value={residency}
                 onChange={(e) => setResidency(e.target.value)}
                 className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
+                suppressHydrationWarning
               >
                 <option value="RU">Россия</option>
                 <option value="KZ">Казахстан</option>
@@ -409,6 +498,37 @@ export function HotelSearch() {
                 <option value="GB">Великобритания</option>
                 <option value="US">США</option>
               </select>
+            </div>
+
+            <div className="lg:w-80 lg:ml-auto rounded-xl border border-amber-200 bg-amber-50 p-4 dark:border-amber-900 dark:bg-amber-950/30" suppressHydrationWarning>
+              <label className="flex items-center gap-2 text-sm font-semibold text-amber-950 dark:text-amber-100">
+                <input
+                  type="checkbox"
+                  checked={testMode}
+                  onChange={(e) => {
+                    const enabled = e.target.checked;
+                    setTestMode(enabled);
+                    if (enabled && !query.trim()) setQuery('Тестовый отель');
+                  }}
+                  className="rounded border-amber-300"
+                />
+                Тестовый режим Ostrovok
+              </label>
+              {testMode && (
+                <div className="mt-3">
+                  <label className="block text-xs text-amber-900 dark:text-amber-200 mb-1">HID тестового отеля</label>
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    value={testHotelId}
+                    onChange={(e) => setTestHotelId(e.target.value.replace(/\D/g, ''))}
+                    className="w-full px-3 py-2 rounded-lg border border-amber-300 bg-white text-gray-900"
+                  />
+                  <p className="mt-2 text-xs text-amber-800 dark:text-amber-200">
+                    Используется тестовый отель HID 8526976. Заказы после проверки нужно отменять.
+                  </p>
+                </div>
+              )}
             </div>
 
             <button
@@ -491,8 +611,8 @@ export function HotelSearch() {
           </div>
 
           {view === 'map' ? (
-            <HotelMap
-              hotels={filteredResults
+            (() => {
+              const mapHotels = filteredResults
                 .map((hotel) => {
                   const geo = (hotel as any).geo as [number, number] | undefined;
                   if (!geo) return null;
@@ -507,8 +627,24 @@ export function HotelSearch() {
                     lat: geo[1],
                   } satisfies HotelMapPoint;
                 })
-                .filter(Boolean) as HotelMapPoint[]}
-            />
+                .filter(Boolean) as HotelMapPoint[];
+
+              return mapHotels.length > 0 ? (
+                <HotelMap hotels={mapHotels} />
+              ) : (
+                <div className="rounded-2xl border border-slate-200 bg-white p-10 text-center">
+                  <p className="text-lg font-semibold text-slate-900">Для найденного отеля нет координат карты</p>
+                  <p className="mt-2 text-sm text-slate-600">Откройте список, чтобы увидеть карточку и ссылку бронирования.</p>
+                  <button
+                    type="button"
+                    onClick={() => setView('list')}
+                    className="mt-5 rounded-xl bg-blue-900 px-5 py-3 text-sm font-bold text-white hover:bg-blue-800"
+                  >
+                    Открыть список
+                  </button>
+                </div>
+              );
+            })()
           ) : (
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
               <aside className="lg:col-span-1">
@@ -556,15 +692,52 @@ export function HotelSearch() {
                             <span>Бесплатная отмена до {formatCancellationDate(hotel.freeCancellationBefore)}</span>
                           </div>
                         )}
+                        {hotel.availability === false && (
+                          <div className="text-sm text-amber-700">
+                            Нет доступных тарифов на выбранные даты
+                          </div>
+                        )}
                       </div>
-                      <a
-                        href={getOstrovokUrl(hotel)}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="mt-4 bg-blue-900 hover:bg-blue-800 text-white font-bold text-sm px-4 py-2.5 rounded-xl transition-colors text-center"
-                      >
-                        Забронировать
-                      </a>
+                      {hotel.availability === false ? (
+                        <div className="mt-4 grid grid-cols-2 gap-2">
+                          <span className="bg-slate-100 text-slate-600 font-bold text-sm px-3 py-2.5 rounded-xl text-center">
+                            Нет тарифов
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => loadHotelRates(hotel)}
+                            disabled={ratesLoading === String(hotel.ostrovokHid)}
+                            className="bg-blue-900 hover:bg-blue-800 text-white font-bold text-sm px-3 py-2.5 rounded-xl transition-colors disabled:opacity-60"
+                          >
+                            {ratesLoading === String(hotel.ostrovokHid) ? 'Проверка...' : 'Проверить тарифы'}
+                          </button>
+                        </div>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => loadHotelRates(hotel)}
+                          disabled={ratesLoading === String(hotel.ostrovokHid)}
+                          className="mt-4 bg-blue-900 hover:bg-blue-800 text-white font-bold text-sm px-4 py-2.5 rounded-xl transition-colors text-center disabled:opacity-60"
+                        >
+                          {ratesLoading === String(hotel.ostrovokHid) ? 'Загрузка тарифов...' : 'Показать тарифы'}
+                        </button>
+                      )}
+                      {ratesByHotel[String(hotel.ostrovokHid)]?.map((rate, index) => (
+                        <button
+                          key={rate.book_hash || rate.match_hash || index}
+                          type="button"
+                          onClick={() => setSelectedRate({ hotel, rate })}
+                          className="mt-2 w-full rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 text-left text-sm text-blue-950 hover:bg-blue-100"
+                        >
+                          <span className="font-semibold">{rate.room_name || 'Доступный номер'}</span>
+                          {rate.meal && <span className="ml-2 text-blue-800">{rate.meal}</span>}
+                          {rate.payment_options?.payment_types?.[0]?.show_amount && (
+                            <span className="float-right font-bold">
+                              {rate.payment_options.payment_types[0].show_amount} {rate.payment_options.payment_types[0].show_currency_code || ''}
+                            </span>
+                          )}
+                        </button>
+                      ))}
                     </div>
                   </div>
                 ))}
@@ -572,6 +745,19 @@ export function HotelSearch() {
             </div>
           )}
         </>
+      )}
+      {selectedRate?.rate.book_hash && (
+        <div className="mx-auto mt-8 max-w-3xl">
+          <BookingForm
+            hotelHid={selectedRate.hotel.ostrovokHid || 0}
+            hotelName={selectedRate.hotel.name}
+            initialBookHash={selectedRate.rate.book_hash}
+            initialCheckin={checkin}
+            initialCheckout={checkout}
+            cancellationPolicies={selectedRate.rate.cancellation_penalties}
+            taxes={selectedRate.rate.payment_options?.payment_types?.[0]?.tax_data?.taxes}
+          />
+        </div>
       )}
     </>
   );

@@ -7,6 +7,9 @@ interface BookingFormProps {
   hotelName: string;
   cancellationPolicies?: any;
   taxes?: any[];
+  initialBookHash?: string;
+  initialCheckin?: string;
+  initialCheckout?: string;
 }
 
 type BookingStep = 'form' | 'prebook' | 'booking' | '3ds' | 'success' | 'error';
@@ -23,10 +26,18 @@ interface RoomData {
   childrenAges: number[];
 }
 
-export function BookingForm({ hotelHid, hotelName, cancellationPolicies, taxes }: BookingFormProps) {
+export function BookingForm({
+  hotelHid,
+  hotelName,
+  cancellationPolicies,
+  taxes,
+  initialBookHash,
+  initialCheckin,
+  initialCheckout,
+}: BookingFormProps) {
   const [step, setStep] = useState<BookingStep>('form');
-  const [checkin, setCheckin] = useState('');
-  const [checkout, setCheckout] = useState('');
+  const [checkin, setCheckin] = useState(initialCheckin || '');
+  const [checkout, setCheckout] = useState(initialCheckout || '');
   const [roomsCount, setRoomsCount] = useState('1');
   const [rooms, setRooms] = useState<RoomData[]>([{ adults: 2, childrenAges: [] }]);
   const [loading, setLoading] = useState(false);
@@ -72,7 +83,7 @@ export function BookingForm({ hotelHid, hotelName, cancellationPolicies, taxes }
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          bookHash: `hotel-${hotelHid}-${checkin}-${checkout}`,
+          bookHash: initialBookHash || `hotel-${hotelHid}-${checkin}-${checkout}`,
           priceIncreasePercent: 0,
         }),
       });

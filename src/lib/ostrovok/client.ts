@@ -93,11 +93,11 @@ export class OstrovokClient {
     return response.data;
   }
 
-  async getHotelContent(hid: number) {
+  async getHotelContent(hid: number, timeout?: number) {
     const response = await this.client.post('/b2b/v3/hotel/info/', {
       hid,
       language: 'ru',
-    });
+    }, timeout ? { timeout } : undefined);
     return response.data;
   }
 
@@ -143,6 +143,7 @@ export class OstrovokClient {
     checkout: string;
     guests: Array<{ adults: number; children?: number[] }>;
     residency?: string;
+    timeout?: number;
   }) {
     const response = await this.client.post('/b2b/v3/search/serp/hotels/', {
       hids: params.hotelIds.map(id => Number(id)),
@@ -151,7 +152,7 @@ export class OstrovokClient {
       guests: params.guests,
       residency: params.residency,
       language: 'ru',
-    });
+    }, params.timeout ? { timeout: params.timeout } : undefined);
     return response.data;
   }
 

@@ -23,6 +23,44 @@ const CITY_COORDS: Record<string, { lat: number; lon: number }> = {
   'пхукет': { lat: 7.8804, lon: 98.3923 },
 };
 
+const TEST_HOTEL_HID = 8526976;
+const TEST_HOTEL_FALLBACK = {
+  hid: TEST_HOTEL_HID,
+  id: 'test_hotel',
+  name: 'Тестовый отель Ostrovok',
+  region: { name: 'Белогорск', country_code: 'RU' },
+  address: 'улица Московская 123, Белогорск',
+  star_rating: 0,
+  images: [],
+  serp_filters: [],
+};
+
+function toTestHotelResult(h: any) {
+  if (!h?.hid) return null;
+
+  return {
+    id: String(h.id || h.hid),
+    ostrovokHid: h.hid,
+    name: h.name || `Отель ${h.hid}`,
+    slug: `hotel-${h.hid}`,
+    city: h.region?.name || 'Неизвестно',
+    country: h.region?.country_code || 'RU',
+    address: h.address || null,
+    stars: Number(h.star_rating || 0),
+    geo: h.latitude != null && h.longitude != null
+      ? [Number(h.longitude), Number(h.latitude)] as [number, number]
+      : null,
+    images: Array.isArray(h.images) ? h.images.map((url: string) => ({ medium: url.replace('{size}', '1024x768') })) : [],
+    amenities: Array.isArray(h.serp_filters) ? h.serp_filters : [],
+    description: (h.description_struct?.[0]?.paragraphs || []).join('\n') || null,
+    minPrice: null,
+    taxesIncluded: null,
+    mealType: null,
+    freeCancellationBefore: null,
+    availability: false,
+  };
+}
+
 async function upsertHotel(h: any) {
   if (!h?.hid) return null;
   try {
@@ -75,23 +113,27 @@ async function upsertHotel(h: any) {
 
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
+  console.log('Received search params:', Object.fromEntries(searchParams.entries()));
   const parsed = searchQuerySchema.safeParse({
     q: searchParams.get('q'),
     checkin: searchParams.get('checkin'),
     checkout: searchParams.get('checkout'),
     adults: searchParams.get('adults'),
-    children: searchParams.get('children'),
+    children: searchParams.get('children') ?? '[]',
     residency: searchParams.get('residency'),
+    testMode: searchParams.get('testMode') ?? undefined,
+    hotelId: searchParams.get('hotelId') ?? undefined,
   });
 
   if (!parsed.success) {
+    console.error('Validation error:', parsed.error.flatten());
     return NextResponse.json(
       { error: 'Invalid search params', details: parsed.error.flatten() },
       { status: 400 }
     );
   }
 
-  const { q: query, checkin, checkout, adults, children, residency } = parsed.data;
+  const { q: query, checkin, checkout, adults, children, residency, testMode, hotelId } = parsed.data;
 
   try {
     if (!query) {
@@ -129,15 +171,78 @@ export async function GET(req: Request) {
     }
 
     const lowerQuery = query.toLowerCase().trim();
-    const cacheKey = getCacheKey('search', { q: lowerQuery, checkin, checkout, adults, children, residency });
+    const cacheKey = getCacheKey('search', {
+      q: lowerQuery,
+      checkin,
+      checkout,
+      adults,
+      children,
+      residency,
+      testMode,
+      hotelId,
+    });
 
-    try {
-      const cached = await getCached<any>(cacheKey);
-      if (cached) {
-        return NextResponse.json({ ...cached, cached: true });
+    if (testMode !== '1') {
+      try {
+        const cached = await getCached<any>(cacheKey);
+        if (cached) {
+          return NextResponse.json({ ...cached, cached: true });
+        }
+      } catch (e) {
+        console.warn('[SEARCH] Cache read failed, continuing without cache:', e);
       }
-    } catch (e) {
-      console.warn('[SEARCH] Cache read failed, continuing without cache:', e);
+    }
+
+    if (testMode === '1') {
+      if (hotelId !== TEST_HOTEL_HID) {
+        return NextResponse.json(
+          { error: `В тестовом режиме доступен только HID ${TEST_HOTEL_HID}` },
+          { status: 400 }
+        );
+      }
+
+      const guestBase = { adults };
+      let searchResult: any = null;
+      try {
+        searchResult = await ostrovokClient.searchByHotelIds({
+          hotelIds: [String(TEST_HOTEL_HID)],
+          checkin,
+          checkout,
+          guests: children.length > 0 ? [{ ...guestBase, children }] : [guestBase],
+          residency,
+          timeout: 15000,
+        });
+      } catch (error) {
+        console.warn('[SEARCH TEST] Availability request failed, loading hotel content:', error);
+      }
+
+      if (searchResult?.status === 'ok' && Array.isArray(searchResult.data?.hotels)) {
+        const saved = await Promise.allSettled(searchResult.data.hotels.map(upsertHotel));
+        const results = saved
+          .filter((r): r is PromiseFulfilledResult<any> => r.status === 'fulfilled')
+          .map((r) => r.value)
+          .filter(Boolean);
+        if (results.length > 0) {
+          return NextResponse.json({ results, source: 'ostrovok-test', cached: false });
+        }
+      }
+
+      let hotelInfo: any = null;
+      try {
+        hotelInfo = await ostrovokClient.getHotelContent(TEST_HOTEL_HID, 10000);
+      } catch (error) {
+        console.warn('[SEARCH TEST] Hotel content request failed, using fallback:', error);
+      }
+      const testHotel = toTestHotelResult(
+        hotelInfo?.data?.data || hotelInfo?.data || TEST_HOTEL_FALLBACK
+      );
+
+      return NextResponse.json({
+        results: testHotel ? [testHotel] : [],
+        source: 'ostrovok-test',
+        cached: false,
+        availabilityMessage: 'Для выбранных дат доступных тарифов нет. Карточка отеля загружена для проверки интеграции.',
+      });
     }
 
     if (checkin && checkout) {

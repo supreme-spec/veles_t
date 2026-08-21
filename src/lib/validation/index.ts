@@ -16,6 +16,8 @@ export const searchQuerySchema = z.object({
     }
   }),
   residency: z.string().length(2, 'Код резиденции должен состоять из 2 букв').default('RU'),
+  testMode: z.enum(['1']).optional(),
+  hotelId: z.coerce.number().int().positive().optional(),
 }).refine((data) => new Date(data.checkout) > new Date(data.checkin), {
   message: 'Дата выезда должна быть позже даты заезда',
   path: ['checkout'],

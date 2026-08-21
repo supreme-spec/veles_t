@@ -54,7 +54,7 @@ export function SearchFilters({ filters, onChange }: SearchFiltersProps) {
   return (
     <div className="space-y-5">
       <div>
-        <label className="block text-sm font-semibold text-slate-900 mb-2">Цена за ночь, ₽</label>
+        <label className="block text-sm font-semibold text-slate-900 dark:text-white mb-2">Цена за ночь, ₽</label>
         <div className="flex items-center gap-2">
           <input
             type="number"
@@ -66,9 +66,9 @@ export function SearchFilters({ filters, onChange }: SearchFiltersProps) {
                 priceRange: [Number(e.target.value) || 0, filters.priceRange[1]],
               })
             }
-            className="w-24 rounded-lg border border-slate-200 px-3 py-2 text-sm"
+            className="w-24 rounded-lg border border-slate-200 bg-white text-slate-900 placeholder:text-slate-500 px-3 py-2 text-sm dark:border-slate-600 dark:bg-slate-700 dark:text-white dark:placeholder:text-slate-300"
           />
-          <span className="text-slate-400">—</span>
+          <span className="text-slate-500 dark:text-slate-300">—</span>
           <input
             type="number"
             placeholder="До"
@@ -79,13 +79,13 @@ export function SearchFilters({ filters, onChange }: SearchFiltersProps) {
                 priceRange: [filters.priceRange[0], Number(e.target.value) || 200000],
               })
             }
-            className="w-24 rounded-lg border border-slate-200 px-3 py-2 text-sm"
+            className="w-24 rounded-lg border border-slate-200 bg-white text-slate-900 placeholder:text-slate-500 px-3 py-2 text-sm dark:border-slate-600 dark:bg-slate-700 dark:text-white dark:placeholder:text-slate-300"
           />
         </div>
       </div>
 
       <div>
-        <label className="block text-sm font-semibold text-slate-900 mb-2">Категория</label>
+        <label className="block text-sm font-semibold text-slate-900 dark:text-white mb-2">Категория</label>
         <div className="flex flex-wrap gap-2">
           {[2, 3, 4, 5].map((stars) => (
             <button
@@ -95,7 +95,7 @@ export function SearchFilters({ filters, onChange }: SearchFiltersProps) {
               className={`rounded-lg border px-3 py-1.5 text-sm font-semibold transition-colors ${
                 filters.stars.includes(stars)
                   ? 'bg-blue-900 text-white border-blue-900'
-                  : 'bg-white hover:bg-slate-50 border-slate-200'
+                  : 'bg-white text-slate-700 hover:bg-slate-50 border-slate-200 dark:bg-slate-700 dark:text-white dark:hover:bg-slate-600 dark:border-slate-500'
               }`}
             >
               {stars}★
@@ -105,7 +105,7 @@ export function SearchFilters({ filters, onChange }: SearchFiltersProps) {
       </div>
 
       <div>
-        <label className="block text-sm font-semibold text-slate-900 mb-2">Удобства</label>
+        <label className="block text-sm font-semibold text-slate-900 dark:text-white mb-2">Удобства</label>
         <div className="max-h-48 overflow-y-auto space-y-2">
           {AMENITY_OPTIONS.map((amenity) => (
             <label key={amenity} className="flex items-center gap-2 cursor-pointer text-sm">
@@ -115,7 +115,7 @@ export function SearchFilters({ filters, onChange }: SearchFiltersProps) {
                 onChange={() => toggleArrayValue('amenities', amenity)}
                 className="rounded border-slate-300"
               />
-              <span className="text-slate-700">{amenity}</span>
+              <span className="text-slate-700 dark:text-slate-200">{amenity}</span>
             </label>
           ))}
         </div>
@@ -128,7 +128,7 @@ export function SearchFilters({ filters, onChange }: SearchFiltersProps) {
           onChange={(e) => onChange({ ...filters, freeCancellation: e.target.checked })}
           className="rounded border-slate-300"
         />
-        <span className="text-sm font-semibold text-slate-900">Только с бесплатной отменой</span>
+        <span className="text-sm font-semibold text-slate-900 dark:text-white">Только с бесплатной отменой</span>
       </label>
     </div>
   );
