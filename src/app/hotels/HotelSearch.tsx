@@ -298,7 +298,7 @@ export function HotelSearch() {
           checkout,
           guests: [{ adults: Number(adults), children: childrenAges }],
           residency,
-          timeout: 30000,
+          timeout: 30,
         }),
       });
       const data = await response.json();
@@ -614,7 +614,7 @@ export function HotelSearch() {
               const mapHotels = filteredResults
                 .map((hotel) => {
                   const geo = (hotel as any).geo as [number, number] | undefined;
-                  if (!geo) return null;
+                  if (!geo || (geo[0] === 0 && geo[1] === 0)) return null;
                   return {
                     id: hotel.id,
                     name: hotel.name,

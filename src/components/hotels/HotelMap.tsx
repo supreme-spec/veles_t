@@ -1,10 +1,29 @@
 'use client';
 
-import { useMemo, useRef } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import Map, { Marker, Popup, NavigationControl, GeolocateControl } from 'react-map-gl/maplibre';
 import 'maplibre-gl/dist/maplibre-gl.css';
 
-const MAP_STYLE = 'https://tiles.openfreemap.org/styles/liberty';
+const VECTOR_STYLE = 'https://tiles.openfreemap.org/styles/liberty';
+
+const OSM_RASTER_STYLE = {
+  version: 8,
+  name: 'osm-raster-fallback',
+  sources: {
+    osm: {
+      type: 'raster',
+      tiles: [
+        'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+        'https://a.tile.openstreetmap.org/{z}/{x}/{y}.png',
+        'https://b.tile.openstreetmap.org/{z}/{x}/{y}.png',
+        'https://c.tile.openstreetmap.org/{z}/{x}/{y}.png',
+      ],
+      tileSize: 256,
+      attribution: '© OpenStreetMap contributors',
+    },
+  },
+  layers: [{ id: 'osm-raster', type: 'raster', source: 'osm' }],
+} as const;
 
 export interface HotelMapPoint {
   id: string;
@@ -25,6 +44,8 @@ interface HotelMapProps {
 
 export function HotelMap({ hotels, selectedHotelId, onSelectHotel }: HotelMapProps) {
   const mapRef = useRef<any>(null);
+  const [mapStyle, setMapStyle] = useState<any>(VECTOR_STYLE);
+  const [styleFailed, setStyleFailed] = useState(false);
 
   const bounds = useMemo(() => {
     if (!hotels.length) return undefined;
@@ -53,12 +74,19 @@ export function HotelMap({ hotels, selectedHotelId, onSelectHotel }: HotelMapPro
     <div className="w-full h-[420px] rounded-2xl overflow-hidden border border-slate-200">
       <Map
         ref={mapRef}
-        mapStyle={MAP_STYLE}
+        mapStyle={mapStyle}
         center={[center.lng, center.lat]}
         zoom={hotels.length > 1 ? 4 : 12}
         maxZoom={16}
         interactiveLayerIds={[]}
         onClick={() => onSelectHotel?.(null)}
+        onError={(e: any) => {
+          if (!styleFailed) {
+            console.warn('[MAP] Vector style failed, switching to OSM raster:', e?.error?.message || e);
+            setStyleFailed(true);
+            setMapStyle(OSM_RASTER_STYLE);
+          }
+        }}
       >
         <NavigationControl position="top-right" />
         <GeolocateControl position="top-right" />
